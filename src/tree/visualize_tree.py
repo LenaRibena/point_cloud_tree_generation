@@ -128,7 +128,7 @@ def load_data_npz(path: Path) -> Tuple[Cloud, TreeSkeleton]:
 
 
 def main():
-    cloud, skeleton = load_data_npz("tree_dataset2/london_14.npz")
+    cloud, skeleton = load_data_npz("data/raw/london_14.npz")
     o3d_pcd = cloud.as_open3d()
     o3d_skeleton = skeleton.as_o3d_lineset()
 
