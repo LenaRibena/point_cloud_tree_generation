@@ -19,6 +19,7 @@ class PCTreeDataset(Dataset):
         # Get all data files from the specified data path folder
         self.data_path = Path(raw_data_path)
         self.data_files = []
+        self.fixed_size = 100000
         
         for folder in os.listdir(self.data_path):
             data_dir = Path(self.data_path, folder)
@@ -61,6 +62,15 @@ class PCTreeDataset(Dataset):
             data = self.transform(data)
             
         return data
+    
+    def resample(self, points):
+        weights = torch.ones(len(points))
+        if len(points) >= self.fixed_size:
+            idx = torch.multinomial(weights, len(points), replace=False)
+        else:
+            raise ValueError("Not enough points in the point cloud.")
+            # idx = np.random.choice(len(points), self.fixed_size, replace=True)
+        return points[idx]
     
     def get_train_val_test_datasets(self, dataset, train_ratio, val_ratio):
         assert (train_ratio + val_ratio) <= 1

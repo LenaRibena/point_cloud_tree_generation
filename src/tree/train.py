@@ -25,6 +25,18 @@ logger.info('Loading datasets...')
 
 PROJECT_PATH = os.getcwd()
 
+def custom_collate_fn(batch):
+    # Find the smallest number of points in the batch
+    min_points = min(item.shape[0] for item in batch)
+    
+    # Truncate each point cloud to the smallest number of points
+    batch = [item[:min_points] for item in batch]
+    
+    # Stack the batch
+    batch = torch.stack(batch)
+    
+    return batch
+
 # Train, validate and test
 @hydra.main(version_base="1.2", config_path=os.path.join(PROJECT_PATH, "configs"), config_name='default_config')
 def train(args):
@@ -35,7 +47,8 @@ def train(args):
     train_iter = DataLoader(train_dset,
                             batch_size=args.batch_size,
                             num_workers=0,
-                            shuffle=True
+                            shuffle=True,
+                            collate_fn=custom_collate_fn
                             )
 
     # Model
@@ -51,9 +64,8 @@ def train(args):
 
     # Optimizer and scheduler
     optimizer = torch.optim.Adam(model.parameters(), 
-        lr=args.lr, 
-        weight_decay=args.weight_decay
-    )
+                                 lr=args.lr, 
+                                 weight_decay=args.weight_decay)
     
     # scheduler = get_linear_scheduler(
     #     optimizer,
@@ -64,8 +76,11 @@ def train(args):
     # )
 
     # Load data
-    batch = next(train_iter)
-    x = batch['pointcloud'].to(args.device)
+    batch = next(iter(train_iter))
+    x = batch.to(args.device)
+
+    # TODO: TEMP SOLUTION
+    x = x[:, :5000, :]
 
     # Reset grad and model state
     optimizer.zero_grad()
