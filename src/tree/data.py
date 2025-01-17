@@ -7,6 +7,8 @@ import typer
 from torch.utils.data import Dataset
 
 
+
+
 class PCTreeDataset(Dataset):
     """My custom dataset."""
 
@@ -34,7 +36,7 @@ class PCTreeDataset(Dataset):
     def __getitem__(self, index: int):
         """Return a given sample from the dataset."""
         file_path = self.data_files[index]
-        df = pd.read_csv(file_path, sep=" ", header=None)
+        df: pd.DataFrame = pd.read_csv(file_path, sep=" ", header=None)
         xyz_data = df.iloc[:, :3]
 
         data = torch.tensor(xyz_data.values, dtype=torch.float32, device=self.device)

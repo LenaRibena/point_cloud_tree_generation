@@ -32,6 +32,13 @@ lint.select = ['F', 'W', 'A', 'PLC', 'PLE', 'PLW', 'I']
 [tool.ruff.lint.per-file-ignores]
 "reports/*" = ["ALL"]
 
+[tool.mypy]
+exclude = "(reports/|tasks.py|src/tree/visualize_tree.py|src/tree/model/*)"
+
+[[tool.mypy.overrides]]
+module = ["google.cloud.*"]
+follow_untyped_imports = true
+
 
 [tool.coverage.run]
 omit = ["tests/*"]
