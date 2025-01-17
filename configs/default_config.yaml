@@ -1,0 +1,12 @@
+path: "data/raw/urban_tree_dataset"
+split: "train"
+batch_size: 1
+num_workers: 0
+device: "cuda"  
+model: "gaussian" 
+spectral_norm: False
+lr: 1e-3
+weight_decay: 1e-5
+kl_weight: 1e-1
+max_grad_norm: 1.0
+latent_dim: 128
