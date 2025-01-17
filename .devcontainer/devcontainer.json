@@ -1,0 +1,26 @@
+{
+    "name": "Node.js Container",
+    "image": "model:latest",
+    "onCreateCommand": "echo 'Now entering the container!'",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "ms-python.python",
+                "streetsidesoftware.code-spell-checker",
+                "eamodio.gitlens",
+                "coenraads.bracket-pair-colorizer-2"
+            ]
+        }
+    },
+    "mounts": [
+        "source=./,target=/trees,type=bind,consistency=cached"
+    ],
+    "containerEnv": {
+        "NODE_ENV": "development" 
+    },
+    "workspaceFolder": "/trees" 
+}
