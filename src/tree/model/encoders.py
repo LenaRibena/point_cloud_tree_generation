@@ -1,14 +1,12 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-from model.model_utils import knn, local_maxpool, local_cov, Residual_Linear_Layer
+from model.model_utils import Residual_Linear_Layer, knn, local_cov, local_maxpool
 
 
 class FoldNet_Encoder_Linear(nn.Module):
     def __init__(self, args):
         super(FoldNet_Encoder_Linear, self).__init__()
-        if args.k == None:
+        if args.k is None:
             self.k = 16
         else:
             self.k = args.k
@@ -23,18 +21,13 @@ class FoldNet_Encoder_Linear(nn.Module):
             Residual_Linear_Layer(128, 128),
             nn.ReLU(),
         )
-        self.linear1 = nn.Sequential(Residual_Linear_Layer(128, 128),
-                                     nn.ReLU(),
-                                     nn.Linear(128, 256),
-                                     nn.ReLU())
+        self.linear1 = nn.Sequential(Residual_Linear_Layer(128, 128), nn.ReLU(), nn.Linear(128, 256), nn.ReLU())
 
-        self.linear2 = nn.Sequential(Residual_Linear_Layer(256, 256),
-                                     nn.ReLU(),
-                                     nn.Linear(256, 512))
+        self.linear2 = nn.Sequential(Residual_Linear_Layer(256, 256), nn.ReLU(), nn.Linear(256, 512))
         self.mlp2 = nn.Sequential(
-            nn.Linear(512, int(2*args.feat_dims)),
+            nn.Linear(512, int(2 * args.feat_dims)),
             nn.ReLU(),
-            nn.Linear(int(2*args.feat_dims), int(2*args.feat_dims))
+            nn.Linear(int(2 * args.feat_dims), int(2 * args.feat_dims)),
         )
 
     def graph_layer(self, x, idx):

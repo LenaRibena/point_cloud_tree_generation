@@ -1,12 +1,13 @@
 import torch
 import torch.nn as nn
 
+
 def knn(x, k):
     batch_size = x.size(0)
     num_points = x.size(2)
 
     inner = -2 * torch.matmul(x.transpose(2, 1), x)
-    xx = torch.sum(x ** 2, dim=1, keepdim=True)
+    xx = torch.sum(x**2, dim=1, keepdim=True)
     pairwise_distance = -xx - inner - xx.transpose(2, 1)
 
     idx = pairwise_distance.topk(k=k, dim=-1)[1]  # (batch_size, num_points, k)
@@ -27,8 +28,9 @@ def local_cov(pts, idx):
     x = x.view(batch_size * num_points, -1)[idx, :]  # (batch_size*num_points*2, 3)
     x = x.view(batch_size, num_points, -1, num_dims)  # (batch_size, num_points, k, 3)
 
-    x = torch.matmul(x[:, :, 0].unsqueeze(3), x[:, :, 1].unsqueeze(
-        2))  # (batch_size, num_points, 3, 1) * (batch_size, num_points, 1, 3) -> (batch_size, num_points, 3, 3)
+    x = torch.matmul(
+        x[:, :, 0].unsqueeze(3), x[:, :, 1].unsqueeze(2)
+    )  # (batch_size, num_points, 3, 1) * (batch_size, num_points, 1, 3) -> (batch_size, num_points, 3, 3)
     # x = torch.matmul(x[:,:,1:].transpose(3, 2), x[:,:,1:])
     x = x.view(batch_size, num_points, 9).transpose(2, 1)  # (batch_size, 9, num_points)
 
@@ -46,12 +48,15 @@ def local_maxpool(x, idx):
 
     return x
 
+
 class Residual_Linear_Layer(nn.Module):
     def __init__(self, in_channels, out_channels, bias=True):
         super(Residual_Linear_Layer, self).__init__()
-        self.linear = nn.Sequential(nn.Linear(in_channels, int(out_channels*0.5), bias=bias),
-                                    nn.ReLU(),
-                                    nn.Linear(int(out_channels*0.5), out_channels, bias=bias))
-    
+        self.linear = nn.Sequential(
+            nn.Linear(in_channels, int(out_channels * 0.5), bias=bias),
+            nn.ReLU(),
+            nn.Linear(int(out_channels * 0.5), out_channels, bias=bias),
+        )
+
     def forward(self, x):
         return self.linear(x) + x

@@ -27,6 +27,11 @@ dev = {file = ['requirements_dev.txt']}
 
 [tool.ruff]
 line-length = 120
+lint.select = ['F', 'W', 'A', 'PLC', 'PLE', 'PLW', 'I']
+
+[tool.ruff.lint.per-file-ignores]
+"reports/*" = ["ALL"]
+
 
 [tool.coverage.run]
 omit = ["tests/*"]
