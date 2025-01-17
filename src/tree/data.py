@@ -6,6 +6,9 @@ import torch
 import pandas as pd
 from torch.utils.data import Dataset
 
+from cfg import CFG
+
+
 
 class PCTreeDataset(Dataset):
     """My custom dataset."""
@@ -49,6 +52,46 @@ def preprocess(raw_data_path: Path, output_folder: Path) -> None:
     dataset = PCTreeDataset(raw_data_path)
     dataset.preprocess(output_folder)
 
+import numpy as np
+class PC(Dataset):
+    def __init__(self, data_folder: str, size=CFG.POINTS):
+        self.path = Path(data_folder)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.data_files = list(self.path.glob('*.npz'))
+        self.fixed_size = size
+
+    def __len__(self):
+        return len(self.data_files)
+
+    def __getitem__(self, idx):
+        file_path = self.data_files[idx]
+        points = np.load(file_path)["xyz"]
+        points = self.resample(points)
+        return torch.tensor(points, dtype=torch.float32, device=self.device)
+    
+    def resample(self, points):
+        if len(points) >= self.fixed_size:
+            idx = np.random.choice(len(points), self.fixed_size, replace=False)
+        else:
+            raise ValueError("Not enough points in the point cloud.")
+            # idx = np.random.choice(len(points), self.fixed_size, replace=True)
+        return points[idx]
+    
+    def preprocess(self, output_folder):
+        data = torch.empty(len(self), self.fixed_size, 3, device=self.device)
+        for i in range(len(self)):
+            data[i] = self[i]
+        torch.save(data, f"{output_folder}/data.pt")
+
+    
+
+def _preprocess(raw_data_path: Path, output_folder: Path) -> None:
+    print("Preprocessing data...")
+    dataset = PC(raw_data_path)
+    dataset.preprocess(output_folder)
+
 
 if __name__ == "__main__":
-    typer.run(preprocess)
+    # typer.run(preprocess)
+    _preprocess("data/raw", "data/processed")
+    

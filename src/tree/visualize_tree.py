@@ -3,22 +3,11 @@
 # For example, here's several helpful packages to load
 
 import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import open3d as o3d # pip install open3d
 
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Tuple
-from IPython.display import display
-
-
-# Input data files are available in the read-only "../input/" directory
-# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
-
-import os
-
-# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
-# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
 
 def o3d_cloud(points, colour=None, colours=None, normals=None):
     cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
@@ -89,10 +78,6 @@ class TreeSkeleton:
         return o3d_merge_linesets([branch.to_o3d_lineset() for branch in self.branches.values()])
 
 
-
-
-
-
 def unpackage_data(data: dict) -> Tuple[Cloud, TreeSkeleton]:
     tree_id = data["tree_id"]
     branch_id = data["branch_id"]
@@ -132,8 +117,22 @@ def main():
     o3d_pcd = cloud.as_open3d()
     o3d_skeleton = skeleton.as_o3d_lineset()
 
-
     o3d.visualization.draw_geometries([o3d_pcd, o3d_skeleton])
 
+class TreeViewer():
+    def __init__(self):
+        pass
+
+    def view(self, tree: np.array):
+        cloud = o3d_cloud(tree)
+        o3d.visualization.draw_geometries([cloud])
+
+import torch
 if __name__ == "__main__":
-    main()
+    # main()
+    tv = TreeViewer()
+    # tv.view(np.load("data/raw/london_14.npz")['xyz'])
+    trees = torch.load("data/processed/data.pt", weights_only=True).cpu().numpy()
+    for tree in trees:
+        tv.view(tree)
+    # tv.view(np.load("generated_tree.npz")['xyz'])
