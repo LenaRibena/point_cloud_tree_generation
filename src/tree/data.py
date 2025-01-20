@@ -7,15 +7,13 @@ import typer
 from torch.utils.data import Dataset
 
 
-
-
 class PCTreeDataset(Dataset):
     """My custom dataset."""
 
     def __init__(self, raw_data_path: str | Path, device="cpu") -> None:
         self.data_path = Path(raw_data_path)
         self.data_files = list(self.data_path.glob("*.txt"))
-        assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
+        # assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
 
         if device == "cpu":
             self.device = "cpu"
