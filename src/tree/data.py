@@ -17,17 +17,16 @@ class PCTreeDataset(Dataset):
         self.data_files = list(self.data_path.glob("*.txt"))
         assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
 
-        match device:
-            case "cpu":
+        if device == "cpu":
+            self.device = "cpu"
+        elif device == "cuda":
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            else:
+                warnings.warn("CUDA is not available. Using CPU instead.")
                 self.device = "cpu"
-            case "cuda":
-                if torch.cuda.is_available():
-                    self.device = "cuda"
-                else:
-                    warnings.warn("CUDA is not available. Using CPU instead.")
-                    self.device = "cpu"
-            case _:
-                raise ValueError('Invalid device. Use either "cpu" or "cuda".')
+        else:
+            raise ValueError('Invalid device. Use either "cpu" or "cuda".')
 
     def __len__(self) -> int:
         """Return the length of the dataset."""
