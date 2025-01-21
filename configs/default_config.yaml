@@ -35,8 +35,7 @@ num_workers: 0
 max_grad_norm: 1.0
 spectral_norm: false
 
-debug: true
+debug: false
 hydra:
   run:
-    dir: .
-  output_subdir:
+    dir: ./outputs

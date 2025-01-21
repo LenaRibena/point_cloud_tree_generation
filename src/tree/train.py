@@ -1,48 +1,59 @@
-import logging
 import os
+from datetime import datetime
 
 import hydra
 import torch
 import torch.utils.tensorboard
-import wandb
 from dotenv import load_dotenv
 from hydra.utils import to_absolute_path
+from loguru import logger
 from omegaconf import OmegaConf
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 
+import wandb
 from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
 from tree.models.vae_gaussian import GaussianVAE
-from tree.utils import EarlyStopper, WandbHandler, update_hydra_config
+from tree.utils import EarlyStopper, update_hydra_config
 
 
 @hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="default_config")
 def train(args):
-    logger.info(args)
+    # Set random seed
+    torch.manual_seed(args.seed)
+
+    if args.debug is True:
+        os.environ["WANDB_MODE"] = "disabled"
+    else:
+        os.environ["WANDB_MODE"] = "online"
+
+    experiment_name = f"experiment-{datetime.now():%Y-%m-%d}-{datetime.now().strftime('%H-%M-%S')}"
+    run = wandb.init(
+        entity=os.getenv("WANDB_ENTITY"),
+        project="tree-pc-generator",
+        name=experiment_name,
+        config=OmegaConf.to_container(args, resolve=True, throw_on_missing=True),
+        config_exclude_keys=["hydra", "debug", "device", "num_workers", "data_path"],
+    )
 
     if args.debug is True:
         logger.debug("Debug mode enabled.")
         os.environ["WANDB_MODE"] = "disabled"
     else:
+        # Configure the logger
+        # NOTE: If you wish to not log to stdout, use: logger.remove()
+        logger.add(
+            os.path.join(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir, "pc_tree_log.log"),
+            level="INFO",
+            rotation="100 MB",
+        )
+        logger.add(os.path.join(wandb.run.dir, "pc_tree_log.log"), level="INFO")
         logger.info("Debug mode disabled.")
-        os.environ["WANDB_MODE"] = "online"
 
-    run = wandb.init(
-        project="tree-pc-generator",
-        name="$experiment-{now:%Y-%m-%d}",
-        config=OmegaConf.to_container(args),
-        config_exclude_keys=["hydra", "debug", "device", "num_workers", "data_path"],
-    )
-
-    # Add WandbHandler to logger
-    wandb_handler = WandbHandler()
-    wandb_handler.setLevel(logging.INFO)
-    logger.addHandler(wandb_handler)
-
-    # Set random seed
-    torch.manual_seed(args.seed)
+    logger.info(args)
+    logger.info(f"Experiment name: {experiment_name}.")
 
     # Create train, val and test loaders from the dataset
     dset = PCTreeDataset(
@@ -128,7 +139,8 @@ def train(args):
 
         val_loss /= len(val_iter.dataset)
 
-        logger.info("Epoch %i | [Train] Averaged loss %.6f | [Val] Averaged loss %.6f" % (epoch, train_loss, val_loss))
+        logger.info(f"[Train] Average loss: {train_loss}, Validation loss: {val_loss}")
+        run.log({"Average train loss": train_loss, "Average validation loss": val_loss})
 
         # Early stopping if validation loss does not improve
         early_stopper(val_loss, model)
@@ -136,13 +148,21 @@ def train(args):
             logger.info("Early stopping...")
 
             break
-
-    run.finish()
+    logger.info("Training complete.")
 
     # Save the model
     logger.info("Saving model...")
-    model_path = to_absolute_path(os.path.join("models", f"{args.model}_model.pth"))
-    torch.save(early_stopper.best_model_state, model_path)
+    MODEL_SAVE_PATH = to_absolute_path(os.path.join("models", f"{args.model}_model.pth"))
+    torch.save(early_stopper.best_model_state, MODEL_SAVE_PATH)
+
+    artifact = wandb.Artifact(
+        name="PC_tree_model",
+        type="model",
+        description="A model trained to generate point clouds of tree structures.",
+        metadata={"Best validation loss": -early_stopper.best_score},
+    )
+    artifact.add_file(MODEL_SAVE_PATH)
+    run.log_artifact(artifact)
 
     # Load the best model and test it on the test set
     early_stopper.load_best_model(model)
@@ -159,15 +179,12 @@ def train(args):
             test_loss += model.get_loss(x, kl_weight=kl_weight).item() * x.size(0)
 
     test_loss /= len(test_iter.dataset)
-    logger.info("[Test] Averaged loss %.6f" % test_loss)
-    logger.info("Training complete.")
+    logger.info(f"[Test] average loss: {test_loss}")
+    run.log({"Average test loss": test_loss})
+    logger.info("Testing complete.")
 
+    run.finish()
 
-# Configure the logger
-logging.basicConfig(
-    level=logging.DEBUG, format="[%(asctime)s][%(name)s][%(levelname)s] - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-)
-logger = logging.getLogger()
 
 if __name__ == "__main__":
     # Only create hydra outputs if debug mode is disabled
