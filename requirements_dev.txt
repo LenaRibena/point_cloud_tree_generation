@@ -21,3 +21,10 @@ mkdocstrings-python
 dvc
 gcloud
 dvc-gs
+
+# wandb
+wandb
+python-dotenv
+omegaconf
+
+ruamel-yaml

@@ -1,4 +1,36 @@
+import logging
+
 import torch
+import wandb
+from ruamel.yaml import YAML
+
+
+def update_hydra_config(config_path: str) -> bool:
+    """Function to update the hydra outputs in the configuration file.
+    If debug mode is enabled, the outputs folder from Hydra will not be created.
+    Otherwise, the outputs will be saved in the outputs directory.
+
+    Args:
+        config_path (str): the path to the configuration file
+    """
+    yaml = YAML()
+    yaml.preserve_quotes = True
+
+    with open(config_path, "r") as file:
+        config = yaml.load(file)
+
+    debug = config["debug"]
+
+    if debug is True:
+        config["hydra"] = {"run": {"dir": "."}, "output_subdir": None}
+    else:
+        config["hydra"] = {"run": {"dir": "./outputs"}}
+
+    with open(config_path, "w") as file:
+        yaml.dump(config, file)
+
+    return debug
+
 
 def equal_batch_size(batch: torch.Tensor) -> torch.Tensor:
     """Function to ensure equal batch sizes for each forward pass
@@ -21,6 +53,13 @@ def equal_batch_size(batch: torch.Tensor) -> torch.Tensor:
     batch = torch.stack(batch)
 
     return batch
+
+
+class WandbHandler(logging.Handler):
+    def emit(self, record):
+        log_entry = self.format(record)
+        wandb.log({"log": log_entry})
+
 
 class EarlyStopper:
     def __init__(self, patience: int = 5, delta: float = 0):
