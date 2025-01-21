@@ -22,7 +22,7 @@ class PCTreeDataset(Dataset):
             data_files = list(data_dir.glob("*.txt"))
             self.data_files.extend(data_files)
 
-        assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
+        # assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
 
         self.transform = transform
 

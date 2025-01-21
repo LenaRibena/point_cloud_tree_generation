@@ -4,7 +4,10 @@ import os
 import hydra
 import torch
 import torch.utils.tensorboard
+import wandb
+from dotenv import load_dotenv
 from hydra.utils import to_absolute_path
+from omegaconf import OmegaConf
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 
@@ -12,7 +15,7 @@ from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
 from tree.models.vae_gaussian import GaussianVAE
-from tree.utils import EarlyStopper, update_hydra_config
+from tree.utils import EarlyStopper, WandbHandler, update_hydra_config
 
 
 @hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="default_config")
@@ -21,8 +24,22 @@ def train(args):
 
     if args.debug is True:
         logger.debug("Debug mode enabled.")
+        os.environ["WANDB_MODE"] = "disabled"
     else:
         logger.info("Debug mode disabled.")
+        os.environ["WANDB_MODE"] = "online"
+
+    run = wandb.init(
+        project="tree-pc-generator",
+        name="$experiment-{now:%Y-%m-%d}",
+        config=OmegaConf.to_container(args),
+        config_exclude_keys=["hydra", "debug", "device", "num_workers", "data_path"],
+    )
+
+    # Add WandbHandler to logger
+    wandb_handler = WandbHandler()
+    wandb_handler.setLevel(logging.INFO)
+    logger.addHandler(wandb_handler)
 
     # Set random seed
     torch.manual_seed(args.seed)
@@ -120,6 +137,8 @@ def train(args):
 
             break
 
+    run.finish()
+
     # Save the model
     logger.info("Saving model...")
     model_path = to_absolute_path(os.path.join("models", f"{args.model}_model.pth"))
@@ -153,7 +172,13 @@ logger = logging.getLogger()
 if __name__ == "__main__":
     # Only create hydra outputs if debug mode is disabled
     config_path = os.path.join("configs", "default_config.yaml")
-    update_hydra_config(config_path)
+    debug_status = update_hydra_config(config_path)
+
+    # Only log into wandb if debug mode is disabled
+    if debug_status is False:
+        load_dotenv()
+        LOGIN_KEY = os.getenv("WANDB_API_KEY")
+        wandb.login(key=LOGIN_KEY)
 
     train()
 
