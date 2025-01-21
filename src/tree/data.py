@@ -6,32 +6,29 @@ import torch
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader, random_split
 
+from tree.utils import equal_batch_size
 
 class PCTreeDataset(Dataset):
     """Dataset class for TreeML-Data; a multidisciplinary and multilayer urban tree dataset."""
 
-    def __init__(self, 
-                 split: str, 
-                 raw_data_path: str | Path = 'urban_tree_dataset', 
-                 device = 'cpu', 
+    def __init__(self,
+                 raw_data_path: str | Path = 'data/raw/urban_tree_dataset',
+                 device = 'cpu',
                  transform = None) -> None:
-        
+
         # Get all data files from the specified data path folder
         self.data_path = Path(raw_data_path)
         self.data_files = []
-        self.fixed_size = 100000
-        
+
         for folder in os.listdir(self.data_path):
             data_dir = Path(self.data_path, folder)
             data_files = list(data_dir.glob('*.txt'))
             self.data_files.extend(data_files)
-        
+
         assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
-        assert split in ['train', 'val', 'test'], f"Invalid split: {split}. Use either 'train', 'val', or 'test'."
-        
-        self.split = split
+
         self.transform = transform
-        
+
         # Configure device
         match device:
             case 'cpu':
@@ -56,51 +53,40 @@ class PCTreeDataset(Dataset):
         file_path = self.data_files[index]
         df = pd.read_csv(file_path, sep=' ', header=None)
         xyz_data = df.iloc[:, :3]
-        
+
         data = torch.tensor(xyz_data.values, dtype=torch.float32, device=self.device)
         if self.transform is not None:
             data = self.transform(data)
-            
+
         return data
-    
-    def resample(self, points):
-        weights = torch.ones(len(points))
-        if len(points) >= self.fixed_size:
-            idx = torch.multinomial(weights, len(points), replace=False)
-        else:
-            raise ValueError("Not enough points in the point cloud.")
-            # idx = np.random.choice(len(points), self.fixed_size, replace=True)
-        return points[idx]
-    
-    def get_train_val_test_datasets(self, dataset, train_ratio, val_ratio):
+
+    def get_train_val_test_datasets(self,
+                                    train_ratio: float,
+                                    val_ratio: float):
+
         assert (train_ratio + val_ratio) <= 1
-        train_size = int(len(dataset) * train_ratio)
-        val_size = int(len(dataset) * val_ratio)
-        test_size = len(dataset) - train_size - val_size
-        
-        train_set, val_set, test_set = random_split(dataset, [train_size, val_size, test_size])
+        train_size = int(len(self) * train_ratio)
+        val_size = int(len(self) * val_ratio)
+        test_size = len(self) - train_size - val_size
+
+        train_set, val_set, test_set = random_split(self, [train_size, val_size, test_size])
         return train_set, val_set, test_set
 
 
-    def get_train_val_test_loaders(self, dataset, train_ratio, val_ratio, train_batch_size, val_test_batch_size, num_workers):
-        train_set, val_set, test_set = self.get_train_val_test_datasets(dataset, train_ratio, val_ratio)
+    def get_train_val_test_loaders(self,
+                                   train_ratio: float,
+                                   val_ratio: float,
+                                   batch_size: int,
+                                   num_workers: int):
 
-        train_loader = DataLoader(train_set, train_batch_size, shuffle=True, num_workers=num_workers)
-        val_loader = DataLoader(val_set, val_test_batch_size, shuffle=False, num_workers=num_workers)
-        test_loader = DataLoader(test_set, val_test_batch_size, shuffle=False, num_workers=num_workers)
-        
+        train_set, val_set, test_set = self.get_train_val_test_datasets(train_ratio, val_ratio)
+
+        train_loader = DataLoader(train_set, batch_size, shuffle=True, num_workers=num_workers, collate_fn=equal_batch_size)
+        val_loader = DataLoader(val_set, batch_size, shuffle=False, num_workers=num_workers, collate_fn=equal_batch_size)
+        test_loader = DataLoader(test_set, batch_size, shuffle=False, num_workers=num_workers, collate_fn=equal_batch_size)
+
         return train_loader, val_loader, test_loader
-    
-    def get_data_iterator(iterable):
-        """Allows training with DataLoaders in a single infinite loop:
-            for i, data in enumerate(inf_generator(train_loader)):
-        """
-        iterator = iterable.__iter__()
-        while True:
-            try:
-                yield iterator.__next__()
-            except StopIteration:
-                iterator = iterable.__iter__()
 
 if __name__ == "__main__":
-    tree_dataset = PCTreeDataset(split='train', raw_data_path='data/raw/urban_tree_dataset')
+    tree_dataset = PCTreeDataset(raw_data_path='data/raw/urban_tree_dataset')
+    train_loader, val_loader, test_loader = tree_dataset.get_train_val_test_loaders(train_ratio=0.8, val_ratio=0.1, batch_size=32, num_workers=4)
