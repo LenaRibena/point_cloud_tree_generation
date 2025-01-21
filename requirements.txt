@@ -4,4 +4,3 @@ fastapi
 uvicorn
 pandas
 pandas-stubs
-ruamel-yaml
