@@ -24,7 +24,7 @@ dvc-gs
 
 # wandb
 wandb
-dotenv
+python-dotenv
 omegaconf
 
 ruamel-yaml
