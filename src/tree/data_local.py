@@ -17,9 +17,7 @@ def bucket_metadata(bucket_name):
     print(f"Default Event Based Hold: {bucket.default_event_based_hold}")
     print(f"Default KMS Key Name: {bucket.default_kms_key_name}")
     print(f"Metageneration: {bucket.metageneration}")
-    print(
-        f"Public Access Prevention: {bucket.iam_configuration.public_access_prevention}"
-    )
+    print(f"Public Access Prevention: {bucket.iam_configuration.public_access_prevention}")
     print(f"Retention Effective Time: {bucket.retention_policy_effective_time}")
     print(f"Retention Period: {bucket.retention_period}")
     print(f"Retention Policy Locked: {bucket.retention_policy_locked}")
@@ -29,6 +27,7 @@ def bucket_metadata(bucket_name):
     print(f"Time Created: {bucket.time_created}")
     print(f"Versioning Enabled: {bucket.versioning_enabled}")
     print(f"Labels: {bucket.labels}")
+
 
 def download_blob_into_memory(bucket_name, blob_name):
     """Downloads a blob into memory."""
@@ -55,12 +54,8 @@ def download_blob_into_memory(bucket_name, blob_name):
         )
     )
 
-def download_byte_range(
-    bucket_name, 
-    source_blob_name, 
-    start_byte, end_byte, 
-    destination_file_name
-):
+
+def download_byte_range(bucket_name, source_blob_name, start_byte, end_byte, destination_file_name):
     """Downloads a blob from the bucket."""
     # The ID of your GCS bucket
     # bucket_name = "your-bucket-name"
@@ -94,6 +89,7 @@ def download_byte_range(
         )
     )
 
+
 def list_blobs(bucket_name):
     """Lists all the blobs in a bucket."""
     storage_client = storage.Client()
@@ -105,6 +101,7 @@ def list_blobs(bucket_name):
     for blob in blobs:
         print(blob.name)
 
+
 if __name__ == "__main__":
     bucket_name = "data-tree"
     # list_blobs(bucket_name)
@@ -112,10 +109,10 @@ if __name__ == "__main__":
 
     source_blob_name = "urban_tree_dataset/2023-01-13_70/2023-01-13_70_000018.txt"
     download_blob_into_memory(bucket_name, source_blob_name)
-    # start_byte, end_byte 
+    # start_byte, end_byte
     # destination_file_name
     # download_byte_range(
     #     "cloud-samples-data",
-    #     "storage-samples/blobs/text.txt", 
+    #     "storage-samples/blobs/text.txt",
     #     0, 20, "downloaded-text.txt"
     # )

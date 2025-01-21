@@ -2,23 +2,20 @@
 # It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
 # For example, here's several helpful packages to load
 
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
-import open3d as o3d # pip install open3d
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Tuple
-from IPython.display import display
 
+import numpy as np  # linear algebra
+import open3d as o3d  # pip install open3d
 
 # Input data files are available in the read-only "../input/" directory
 # For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory
 
-import os
 
-# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All" 
+# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using "Save & Run All"
 # You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session
+
 
 def o3d_cloud(points, colour=None, colours=None, normals=None):
     cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
@@ -34,9 +31,7 @@ def o3d_cloud(points, colour=None, colours=None, normals=None):
 
 
 def o3d_line_set(vertices, edges, colour=None):
-    ls = o3d.geometry.LineSet(
-        o3d.utility.Vector3dVector(vertices), o3d.utility.Vector2iVector(edges)
-    )
+    ls = o3d.geometry.LineSet(o3d.utility.Vector3dVector(vertices), o3d.utility.Vector2iVector(edges))
     if colour is not None:
         return ls.paint_uniform_color(colour)
     return ls
@@ -59,6 +54,7 @@ def o3d_merge_linesets(line_sets, colour=(0, 0, 0)):
 
     return o3d_line_set(points, idxs).paint_uniform_color(colour)
 
+
 @dataclass
 class BranchSkeleton:
     _id: int
@@ -66,31 +62,29 @@ class BranchSkeleton:
     xyz: np.array
     radii: np.array
     child_id: int = -1
-        
+
     def to_o3d_lineset(self, colour=(0, 0, 0)):
-        return o3d_path(self.xyz, colour)    
-        
+        return o3d_path(self.xyz, colour)
+
+
 @dataclass
 class Cloud:
     xyz: np.array
     rgb: np.array
     class_l: np.array = None
     medial_vector: np.array = None
-        
+
     def as_open3d(self):
         return o3d_cloud(self.xyz, colours=self.rgb)
+
 
 @dataclass
 class TreeSkeleton:
     _id: int
     branches: Dict[int, BranchSkeleton]
-         
+
     def as_o3d_lineset(self):
         return o3d_merge_linesets([branch.to_o3d_lineset() for branch in self.branches.values()])
-
-
-
-
 
 
 def unpackage_data(data: dict) -> Tuple[Cloud, TreeSkeleton]:
@@ -116,9 +110,7 @@ def unpackage_data(data: dict) -> Tuple[Cloud, TreeSkeleton]:
     branches = {}
 
     for idx, _id, parent_id in zip(branch_idx, branch_id, branch_parent_id):
-        branches[_id] = BranchSkeleton(
-            _id, parent_id, skeleton_xyz[idx], skeleton_radii[idx]
-        )
+        branches[_id] = BranchSkeleton(_id, parent_id, skeleton_xyz[idx], skeleton_radii[idx])
 
     return cld, TreeSkeleton(tree_id, branches)
 
@@ -132,8 +124,8 @@ def main():
     o3d_pcd = cloud.as_open3d()
     o3d_skeleton = skeleton.as_o3d_lineset()
 
-
     o3d.visualization.draw_geometries([o3d_pcd, o3d_skeleton])
+
 
 if __name__ == "__main__":
     main()

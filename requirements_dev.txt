@@ -1,17 +1,23 @@
 # commands
-invoke==2.2.0
+invoke
 
 # pre-commit
-pre-commit==3.5.0
+pre-commit
 
 # testing
-pytest==7.4.3
-coverage==7.6.9
+pytest
+coverage
 
 # linting
-ruff==0.1.3
+ruff
+mypy
 
 # docs
-mkdocs==1.5.3
-mkdocs-material==9.4.6
-mkdocstrings-python==1.12.2
+mkdocs
+mkdocs-material
+mkdocstrings-python
+
+# cloud storage (models)
+dvc
+gcloud
+dvc-gs
