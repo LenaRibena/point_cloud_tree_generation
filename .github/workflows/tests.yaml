@@ -33,3 +33,5 @@ jobs:
     - name: Test with pytest
       run: |
         pytest -v
+      env:
+        WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}

@@ -38,4 +38,5 @@ spectral_norm: false
 debug: true
 hydra:
   run:
-    dir: ./outputs
+    dir: .
+  output_subdir:
