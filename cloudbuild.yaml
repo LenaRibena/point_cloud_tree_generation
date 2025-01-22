@@ -7,7 +7,7 @@ steps:
     '-t',
     'europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/$_IMAGE_NAME',
     '-f',
-    'dockerfiles/train.dockerfile'
+    'dockerfiles/cloud.dockerfile'
   ]
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Push container image'
