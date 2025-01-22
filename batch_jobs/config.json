@@ -1,0 +1,42 @@
+{
+    "taskGroups": [
+        {
+            "taskSpec": {
+                "runnables": [
+                    {
+                        "script": {
+                            "text": "# Install nvidia-container-toolkit\ncurl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \\\n  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \\\n    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \\\n    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list\nsudo apt-get update\nsudo apt-get install -y nvidia-container-toolkit\nsudo systemctl restart docker\n\n# Authenticate and run container image with gpu\ngcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin europe-west1-docker.pkg.dev\ndocker run --gpus all europe-west1-docker.pkg.dev/bluemar-code/biodiversity-test/simple_image:latest\necho \"try without gpu\"\ndocker run europe-west1-docker.pkg.dev/bluemar-code/biodiversity-test/simple_image:latest"
+                        }
+                    }
+                ],
+                "computeResource": {
+                    "cpuMilli": 2000,
+                    "memoryMib": 16
+                },
+                "maxRetryCount": 0,
+                "maxRunDuration": "360s"
+            },
+            "taskCount": 1,
+            "parallelism": 1
+        }
+    ],
+    "allocationPolicy": {
+        "instances": [
+            {
+                "installGpuDrivers": true,
+                "policy": {
+                    "machineType": "n1-standard-2",
+                    "accelerators": [
+                        {
+                            "type": "nvidia-tesla-t4",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "logsPolicy": {
+        "destination": "CLOUD_LOGGING"
+    }
+}
