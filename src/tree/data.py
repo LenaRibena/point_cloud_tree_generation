@@ -17,8 +17,6 @@ class PCTreeDataset(Dataset):
     ) -> None:
         # Get all data files from the specified data path folder
         self.data_path = Path(processed_data_path)
-        self.data_files = []
-
         self.data_files = list(self.data_path.rglob("*.npy"))
 
         self.transform = transform
@@ -83,3 +81,10 @@ if __name__ == "__main__":
     train_loader, val_loader, test_loader = tree_dataset.get_train_val_test_loaders(
         train_ratio=0.8, val_ratio=0.1, batch_size=32, num_workers=4
     )
+    # print length of each loader
+    # print(len(train_loader), len(val_loader), len(test_loader))
+
+    # print shape of sample data from train_loader
+    for data in train_loader:
+        print(data.shape)
+        break
