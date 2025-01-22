@@ -5,8 +5,6 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split
 
-from tree.utils.utils import equal_batch_size
-
 
 class PCTreeDataset(Dataset):
     """Dataset class for TreeML-Data; a multidisciplinary and multilayer urban tree dataset.
@@ -65,15 +63,9 @@ class PCTreeDataset(Dataset):
     def get_train_val_test_loaders(self, train_ratio: float, val_ratio: float, batch_size: int, num_workers: int):
         train_set, val_set, test_set = self.get_train_val_test_datasets(train_ratio, val_ratio)
 
-        train_loader = DataLoader(
-            train_set, batch_size, shuffle=True, num_workers=num_workers, collate_fn=equal_batch_size
-        )
-        val_loader = DataLoader(
-            val_set, batch_size, shuffle=False, num_workers=num_workers, collate_fn=equal_batch_size
-        )
-        test_loader = DataLoader(
-            test_set, batch_size, shuffle=False, num_workers=num_workers, collate_fn=equal_batch_size
-        )
+        train_loader = DataLoader(train_set, batch_size, shuffle=True, num_workers=num_workers)
+        val_loader = DataLoader(val_set, batch_size, shuffle=False, num_workers=num_workers)
+        test_loader = DataLoader(test_set, batch_size, shuffle=False, num_workers=num_workers)
 
         return train_loader, val_loader, test_loader
 
