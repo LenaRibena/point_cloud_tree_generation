@@ -1,6 +1,6 @@
 {
     "name": "Node.js Container",
-    "image": "model:latest",
+    "image": "train:latest",
     "onCreateCommand": "echo 'Now entering the container!'",
     "customizations": {
         "vscode": {
@@ -20,7 +20,7 @@
         "source=./,target=/trees,type=bind,consistency=cached"
     ],
     "containerEnv": {
-        "NODE_ENV": "development" 
+        "NODE_ENV": "development"
     },
-    "workspaceFolder": "/trees" 
+    "workspaceFolder": "/trees"
 }
