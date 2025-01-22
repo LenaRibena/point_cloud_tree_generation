@@ -8,7 +8,7 @@ RUN apt update && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
 # Copy relevant files
-COPY requirements.txt /trees/requirements.txt
+COPY requirements_dev.txt /trees/requirements.txt
 COPY pyproject.toml /trees/pyproject.toml
 COPY src/tree /trees/src/tree
 
