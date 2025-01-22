@@ -4,6 +4,7 @@ from datetime import datetime
 import hydra
 import torch
 import torch.utils.tensorboard
+import wandb
 from dotenv import load_dotenv
 from hydra.utils import to_absolute_path
 from loguru import logger
@@ -11,15 +12,14 @@ from omegaconf import OmegaConf
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 
-import wandb
 from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
 from tree.models.vae_gaussian import GaussianVAE
-from tree.utils import EarlyStopper, update_hydra_config
+from tree.utils.utils import EarlyStopper, update_hydra_config
 
 
-@hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="default_config")
+@hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="train")
 def train(args):
     # Set random seed
     torch.manual_seed(args.seed)

@@ -1,28 +1,25 @@
-import os
 import warnings
 from pathlib import Path
 
-import pandas as pd
+import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split
 
-from tree.utils import equal_batch_size
+from tree.utils.utils import equal_batch_size
 
 
 class PCTreeDataset(Dataset):
-    """Dataset class for TreeML-Data; a multidisciplinary and multilayer urban tree dataset."""
+    """Dataset class for TreeML-Data; a multidisciplinary and multilayer urban tree dataset.
+    See tree.preprocess to process the data"""
 
-    def __init__(self, raw_data_path: str | Path = "data/raw/urban_tree_dataset", device="cpu", transform=None) -> None:
+    def __init__(
+        self, processed_data_path: str | Path = "data/processed/urban_tree_dataset", device="cpu", transform=None
+    ) -> None:
         # Get all data files from the specified data path folder
-        self.data_path = Path(raw_data_path)
+        self.data_path = Path(processed_data_path)
         self.data_files = []
 
-        for folder in os.listdir(self.data_path):
-            data_dir = Path(self.data_path, folder)
-            data_files = list(data_dir.glob("*.txt"))
-            self.data_files.extend(data_files)
-
-        # assert len(self.data_files) > 0, f"No data files found or path doesn't exist; {self.data_path}."
+        self.data_files = list(self.data_path.rglob("*.npy"))
 
         self.transform = transform
 
@@ -48,10 +45,9 @@ class PCTreeDataset(Dataset):
     def __getitem__(self, index: int) -> torch.Tensor:
         """Return a given sample from the dataset."""
         file_path = self.data_files[index]
-        df: pd.DataFrame = pd.read_csv(file_path, sep=" ", header=None)
-        xyz_data = df.iloc[:, :3]
+        xyz_data = np.load(file_path)
+        data = torch.from_numpy(xyz_data)  # Note, might need to change the dtype
 
-        data = torch.tensor(xyz_data.values, dtype=torch.float32, device=self.device)
         if self.transform is not None:
             data = self.transform(data)
 

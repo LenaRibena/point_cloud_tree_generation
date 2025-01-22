@@ -1,0 +1,8 @@
+raw_data_path: "data/raw/urban_tree_dataset"
+output_folder: "data/processed/urban_tree_dataset"
+dataset_name: "urban_tree"
+recursive_search: true
+
+urban_tree_conf:
+  nr_cylinders: 1024
+  nr_points: 4096
