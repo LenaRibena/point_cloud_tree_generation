@@ -36,10 +36,10 @@ class UrbanTreeDataPreprocessor(DataPreprocessor):
 
         # Calculate total surface area for all cylinders
         df["surface_area"] = 2 * np.pi * df["radius"] * df["length"]
-        total_surface_area = df["surface_area"].sum()
 
         # Determine the number of points per cylinder proportionally to its surface area
-        df["num_points"] = (df["surface_area"] / total_surface_area * total_points).astype(int)
+        df["scaled_area"] = np.sqrt(df["surface_area"])
+        df["num_points"] = (df["scaled_area"] / df["scaled_area"].sum() * total_points).astype(int)
 
         point_cloud = []
         for _, row in df.iterrows():
@@ -63,6 +63,7 @@ class UrbanTreeDataPreprocessor(DataPreprocessor):
         # Convert to Path objects
         raw_data_path = Path(raw_data_path)
         output_folder = Path(output_folder)
+        output_folder.mkdir(parents=True, exist_ok=True)
 
         csv_files = raw_data_path.rglob("*.csv") if recursive_search else raw_data_path.glob("*.csv")
         if not csv_files:

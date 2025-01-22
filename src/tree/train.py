@@ -16,7 +16,7 @@ from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
 from tree.models.vae_gaussian import GaussianVAE
-from tree.utils import EarlyStopper, update_hydra_config
+from tree.utils.utils import EarlyStopper, update_hydra_config
 
 
 @hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="train")

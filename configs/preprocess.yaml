@@ -1,8 +1,8 @@
-raw_data_path: "D:/Data/mlops_jan_2025/Dataset_QSM/Dataset_QSM"
-output_folder: "D:/Data/mlops_jan_2025/urban_tree_dataset"
+raw_data_path: "data/raw/urban_tree_dataset"
+output_folder: "data/processed/urban_tree_dataset"
 dataset_name: "urban_tree"
 recursive_search: true
 
 urban_tree_conf:
   nr_cylinders: 1024
-  nr_points: 8192
+  nr_points: 4096
