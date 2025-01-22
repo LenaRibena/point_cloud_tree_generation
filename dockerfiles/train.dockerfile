@@ -12,7 +12,7 @@ COPY requirements.txt /trees/requirements.txt
 COPY pyproject.toml /trees/pyproject.toml
 COPY src/tree /trees/src/tree
 
-# Install dependencies
+# Install dependencie(s)
 RUN --mount=type=cache,target=~/pip/.cache/pip pip install -r /trees/requirements.txt --no-cache-dir
 RUN pip install . --no-deps --no-cache-dir
 
