@@ -5,5 +5,19 @@ from tree.data import PCTreeDataset
 
 def test_my_dataset():
     """Test the MyDataset class."""
-    dataset = PCTreeDataset("data/raw")
+    N = 3746
+    dataset = PCTreeDataset("data/processed/urban_tree_dataset")
     assert isinstance(dataset, Dataset)
+    assert len(dataset) == N, f"Incorrect dataset size. Expected {N}, got {len(dataset)}"
+
+    train, val, test = dataset.get_train_val_test_loaders(0.8, 0.1, 32, 4)
+    assert len(train) == 94
+    assert len(val) == 12
+    assert len(test) == 12
+
+    count = 0
+    for dataset in [train, val, test]:
+        for batch in dataset:
+            count += batch.shape[0]
+            assert tuple(batch.shape[1:]) == (4096, 3), "Shape of data is incorrect."
+    assert count == N
