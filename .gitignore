@@ -3,6 +3,8 @@ docs/site/
 # data
 data/
 models/
+wandb/
+outputs/
 
 # test cache
 manual_test/
