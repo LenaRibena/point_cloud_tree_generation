@@ -79,7 +79,7 @@ class PCTreeDataset(Dataset):
 
 
 if __name__ == "__main__":
-    tree_dataset = PCTreeDataset(raw_data_path="data/raw/urban_tree_dataset")
+    tree_dataset = PCTreeDataset(processed_data_path="data/processed/urban_tree_dataset")
     train_loader, val_loader, test_loader = tree_dataset.get_train_val_test_loaders(
         train_ratio=0.8, val_ratio=0.1, batch_size=32, num_workers=4
     )
