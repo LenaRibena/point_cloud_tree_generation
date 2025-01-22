@@ -1,0 +1,23 @@
+program: src/tree/train.py
+name: pc_tree_sweep
+method: bayes
+metric:
+  goal: minimize
+  name: test/loss
+parameters:
+  model:
+    distribution: categorical
+    values: ["gaussian", "flow"]
+  kl_weight:
+    values: [0.001, 0.01, 0.1]
+  latent_dim:
+    values: [64, 128, 256]
+  num_steps:
+    distribution: int_uniform
+    min: 5
+    max: 20
+run_cap: 10
+command:
+  - python
+  - ${program}
+  - ${args_no_hyphens}

@@ -1,8 +1,9 @@
-import logging
-
 import torch
-import wandb
 from ruamel.yaml import YAML
+
+# ---------------------------------------------------------------------------- #
+#                   Utils used in the training script                          #
+# ---------------------------------------------------------------------------- #
 
 
 def update_hydra_config(config_path: str) -> bool:
@@ -53,12 +54,6 @@ def equal_batch_size(batch: torch.Tensor) -> torch.Tensor:
     batch = torch.stack(batch)
 
     return batch
-
-
-class WandbHandler(logging.Handler):
-    def emit(self, record):
-        log_entry = self.format(record)
-        wandb.log({"log": log_entry})
 
 
 class EarlyStopper:

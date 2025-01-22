@@ -16,7 +16,7 @@ from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
 from tree.models.vae_gaussian import GaussianVAE
-from tree.utils.utils import EarlyStopper, update_hydra_config
+from tree.utils.train_utils import EarlyStopper, update_hydra_config
 
 
 @hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="train")
@@ -24,23 +24,26 @@ def train(args):
     # Set random seed
     torch.manual_seed(args.seed)
 
-    if args.debug is True:
-        os.environ["WANDB_MODE"] = "disabled"
-    else:
-        os.environ["WANDB_MODE"] = "online"
+    # Configure and initialize wandb
+    mode = "disabled" if args.debug is True else "online"
+
+    excluded_keys = ("hydra", "debug", "device", "num_workers", "data_path")
+    if args.model == "gaussian":
+        excluded_keys += ("latent_flow_depth", "latent_flow_hidden_dim")
 
     experiment_name = f"experiment-{datetime.now():%Y-%m-%d}-{datetime.now().strftime('%H-%M-%S')}"
     run = wandb.init(
         entity=os.getenv("WANDB_ENTITY"),
         project="tree-pc-generator",
         name=experiment_name,
-        config=OmegaConf.to_container(args, resolve=True, throw_on_missing=True),
-        config_exclude_keys=["hydra", "debug", "device", "num_workers", "data_path"],
+        config=wandb.helper.parse_config(
+            OmegaConf.to_container(args, resolve=True, throw_on_missing=True), exclude=excluded_keys
+        ),
+        mode=mode,
     )
 
     if args.debug is True:
         logger.debug("Debug mode enabled.")
-        os.environ["WANDB_MODE"] = "disabled"
     else:
         # Configure the logger
         # NOTE: If you wish to not log to stdout, use: logger.remove()
@@ -57,7 +60,9 @@ def train(args):
 
     # Create train, val and test loaders from the dataset
     dset = PCTreeDataset(
-        raw_data_path=to_absolute_path(os.path.join(*args.data_path)), device=args.device, transform=args.transform
+        processed_data_path=to_absolute_path(os.path.join(*args.data_path)),
+        device=args.device,
+        transform=args.transform,
     )
 
     train_iter, val_iter, test_iter = dset.get_train_val_test_loaders(
@@ -79,14 +84,6 @@ def train(args):
     # Define optimizer and scheduler
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-    # scheduler = get_linear_scheduler(
-    #     optimizer,
-    #     start_epoch=args.sched_start_epoch,
-    #     end_epoch=args.sched_end_epoch,
-    #     start_lr=args.lr,
-    #     end_lr=args.end_lr
-    # )
-
     # Early stopping
     early_stopper = EarlyStopper(patience=args.patience, delta=args.delta)
 
@@ -100,7 +97,7 @@ def train(args):
             if args.debug and i > 1:
                 break
 
-            x = batch.to(dset.device)
+            x = batch.float().to(dset.device)
 
             # Reset grad and model state
             optimizer.zero_grad()
@@ -116,7 +113,6 @@ def train(args):
             loss.backward()
             orig_grad_norm = clip_grad_norm_(model.parameters(), args.max_grad_norm)
             optimizer.step()
-            # scheduler.step()
 
             if i % 100 == 0:
                 logger.info(
@@ -133,14 +129,14 @@ def train(args):
             if args.debug and j > 1:
                 break
 
-            x = batch.to(dset.device)
+            x = batch.float().to(dset.device)
             with torch.no_grad():
                 val_loss += model.get_loss(x, kl_weight=kl_weight).item() * x.size(0)
 
         val_loss /= len(val_iter.dataset)
 
         logger.info(f"[Train] Average loss: {train_loss}, Validation loss: {val_loss}")
-        run.log({"Average train loss": train_loss, "Average validation loss": val_loss})
+        run.log({"Train/loss": train_loss, "Val/loss": val_loss}, step=epoch)
 
         # Early stopping if validation loss does not improve
         early_stopper(val_loss, model)
@@ -174,13 +170,13 @@ def train(args):
         if args.debug and k > 1:
             break
 
-        x = batch.to(dset.device)
+        x = batch.float().to(dset.device)
         with torch.no_grad():
             test_loss += model.get_loss(x, kl_weight=kl_weight).item() * x.size(0)
 
     test_loss /= len(test_iter.dataset)
     logger.info(f"[Test] average loss: {test_loss}")
-    run.log({"Average test loss": test_loss})
+    run.log({"test/loss": test_loss})
     logger.info("Testing complete.")
 
     run.finish()
@@ -188,7 +184,7 @@ def train(args):
 
 if __name__ == "__main__":
     # Only create hydra outputs if debug mode is disabled
-    config_path = os.path.join("configs", "default_config.yaml")
+    config_path = os.path.join("configs", "train.yaml")
     debug_status = update_hydra_config(config_path)
 
     # Only log into wandb if debug mode is disabled
