@@ -7,7 +7,7 @@ RUN apt update && \
     apt install --no-install-recommends -y build-essential gcc && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
-# Copy relevant file(s)
+# Copy relevant files
 COPY requirements.txt /trees/requirements.txt
 COPY pyproject.toml /trees/pyproject.toml
 COPY src/tree /trees/src/tree
