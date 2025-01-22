@@ -9,6 +9,7 @@ RUN apt update && \
 
 # Copy relevant files
 COPY requirements.txt /trees/requirements.txt
+COPY pyproject.toml /trees/pyproject.toml
 COPY src/tree /trees/src/tree
 
 # Install dependencies
