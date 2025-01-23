@@ -20,6 +20,21 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Set up Goocle Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+          version: 'latest'
+
+    - name: Authenticate with Google Cloud
+      run: |
+          echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > $HOME/gcloud-service-key.json
+          gcloud auth activate-service-account --key-file=$HOME/gcloud-service-key.json
+          gcloud config set project ${{ secrets.GPC_PROJECT_ID }}
+
+    - name: Download data from GCP_SERVICE_ACCOUNT_KEY
+      run: |
+        gsutil cp gs://data-tree/*.npy .
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -35,6 +50,6 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest tests/ -v --ignore=tests/test_data.py
+        pytest tests/ -v --data data/processed
       env:
         WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
