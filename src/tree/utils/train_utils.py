@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 import torch
 from ruamel.yaml import YAML
 
@@ -23,9 +26,11 @@ def update_hydra_config(config_path: str) -> bool:
     debug = config["debug"]
 
     if debug is True:
-        config["hydra"] = {"run": {"dir": "."}, "output_subdir": None}
+        config["hydra"] = {"run": {"dir": config["experiment_dir"]}, "output_subdir": None}
     else:
-        config["hydra"] = {"run": {"dir": "./outputs"}}
+        config["hydra"] = {
+            "run": {"dir": os.path.join(config["experiment_dir"], datetime.now().strftime("%Y-%m-%d-%H-%M"))}
+        }
 
     with open(config_path, "w") as file:
         yaml.dump(config, file)
