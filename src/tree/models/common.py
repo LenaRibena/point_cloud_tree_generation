@@ -1,27 +1,28 @@
-import torch
-from torch.nn import Module, Linear
-from torch.optim.lr_scheduler import LambdaLR
 import numpy as np
+import torch
+import torch.nn as nn
+from torch.optim.lr_scheduler import LambdaLR
 
-def reparameterize_gaussian(mean, logvar):
+
+def reparameterize_gaussian(mean: torch.Tensor, logvar: torch.Tensor) -> torch.Tensor:
     std = torch.exp(0.5 * logvar)
     eps = torch.randn(std.size()).to(mean)
     return mean + std * eps
 
 
-def gaussian_entropy(logvar):
-    const = 0.5 * float(logvar.size(1)) * (1. + np.log(np.pi * 2))
+def gaussian_entropy(logvar: torch.Tensor) -> torch.Tensor:
+    const = 0.5 * float(logvar.size(1)) * (1.0 + np.log(np.pi * 2))
     ent = 0.5 * logvar.sum(dim=1, keepdim=False) + const
     return ent
 
 
-def standard_normal_logprob(z):
+def standard_normal_logprob(z: torch.Tensor) -> torch.Tensor:
     dim = z.size(-1)
     log_z = -0.5 * dim * np.log(2 * np.pi)
     return log_z - z.pow(2) / 2
 
 
-def truncated_normal_(tensor, mean=0, std=1, trunc_std=2):
+def truncated_normal_(tensor: torch.Tensor, mean: float = 0, std: float = 1, trunc_std: float = 2) -> torch.Tensor:
     """
     Taken from https://discuss.pytorch.org/t/implementing-truncated-normal-initializer/4778/15
     """
@@ -34,14 +35,14 @@ def truncated_normal_(tensor, mean=0, std=1, trunc_std=2):
     return tensor
 
 
-class ConcatSquashLinear(Module):
-    def __init__(self, dim_in, dim_out, dim_ctx):
+class ConcatSquashLinear(nn.Module):  # type: ignore
+    def __init__(self, dim_in: int, dim_out: int, dim_ctx: int) -> None:
         super(ConcatSquashLinear, self).__init__()
-        self._layer = Linear(dim_in, dim_out)
-        self._hyper_bias = Linear(dim_ctx, dim_out, bias=False)
-        self._hyper_gate = Linear(dim_ctx, dim_out)
+        self._layer = nn.Linear(dim_in, dim_out)
+        self._hyper_bias = nn.Linear(dim_ctx, dim_out, bias=False)
+        self._hyper_gate = nn.Linear(dim_ctx, dim_out)
 
-    def forward(self, ctx, x):
+    def forward(self, ctx: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
         gate = torch.sigmoid(self._hyper_gate(ctx))
         bias = self._hyper_bias(ctx)
         # if x.dim() == 3:
@@ -51,15 +52,18 @@ class ConcatSquashLinear(Module):
         return ret
 
 
-def get_linear_scheduler(optimizer, start_epoch, end_epoch, start_lr, end_lr):
-    def lr_func(epoch):
+def get_linear_scheduler(
+    optimizer: torch.optim.Optimizer, start_epoch: int, end_epoch: int, start_lr: float, end_lr: float
+) -> LambdaLR:
+    def lr_func(epoch: int) -> float:
         if epoch <= start_epoch:
             return 1.0
         elif epoch <= end_epoch:
             total = end_epoch - start_epoch
             delta = epoch - start_epoch
             frac = delta / total
-            return (1-frac) * 1.0 + frac * (end_lr / start_lr)
+            return (1 - frac) * 1.0 + frac * (end_lr / start_lr)
         else:
             return end_lr / start_lr
+
     return LambdaLR(optimizer, lr_lambda=lr_func)
