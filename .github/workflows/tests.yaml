@@ -20,15 +20,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up Goocle Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
-      with:
-          version: 'latest'
-
     - name: Authenticate with GCP
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+    - name: Set up Goocle Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+          version: 'latest'
 
     - name: Check GCP authentication
       run: |
