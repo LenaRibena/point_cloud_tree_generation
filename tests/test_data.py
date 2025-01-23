@@ -1,9 +1,12 @@
 import os
-from torch.utils.data import Dataset
+
 import pytest
+from torch.utils.data import Dataset
 
 from tree.data import PCTreeDataset
-_PATH_DATA = "data/processed/urban_tree_dataset"
+
+_PATH_DATA = "data/processed"
+
 
 @pytest.mark.skipif(not os.path.exists(_PATH_DATA), reason="No processed data found.")
 def test_my_dataset():

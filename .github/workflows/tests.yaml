@@ -40,6 +40,10 @@ jobs:
         gsutil cp gs://data-tree/processed-data/OptQSM_2023-01-09_17_2_18_000044.npy data/processed
         gsutil cp gs://data-tree/processed-data/OptQSM_2023-01-09_17_2_18_000036.npy data/processed
 
+    - name: Check data is stored
+      run: |
+        ls data/processed
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
