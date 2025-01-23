@@ -40,7 +40,7 @@ max_grad_norm: 1.0
 spectral_norm: false
 
 # Folder where experiments are saved to
-experiments_folder: "./outputs"
+experiments_folder: "./models"
 
 # Debugging
 debug: false
