@@ -39,7 +39,10 @@ num_workers: 0
 max_grad_norm: 1.0
 spectral_norm: false
 
+# Save path
+experiment_dir: "./outputs"
+
 debug: false
 hydra:
   run:
-    dir: ./outputs
+    dir: ./outputs\2025-01-23-13-39
