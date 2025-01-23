@@ -9,4 +9,4 @@ sudo systemctl restart docker
 
 # Authenticate and run container image with gpu
 gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin europe-west1-docker.pkg.dev
-docker run --gpus all europe-west1-docker.pkg.dev/bluemar-code/biodiversity-test/simple_image:latest
+docker run --gpus all --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/test:latest -c "nvidia-smi && echo this is a secret: ${WANDB_PROJECT} && python test.py"
