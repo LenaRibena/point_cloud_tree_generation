@@ -1,12 +1,15 @@
+import os
 from torch.utils.data import Dataset
+import pytest
 
 from tree.data import PCTreeDataset
+_PATH_DATA = "data/processed/urban_tree_dataset"
 
-
+@pytest.mark.skipif(not os.path.exists(_PATH_DATA), reason="No processed data found.")
 def test_my_dataset():
     """Test the MyDataset class."""
     N = 3746
-    dataset = PCTreeDataset("data/processed/urban_tree_dataset")
+    dataset = PCTreeDataset(_PATH_DATA)
     assert isinstance(dataset, Dataset)
     assert len(dataset) == N, f"Incorrect dataset size. Expected {N}, got {len(dataset)}"
 
