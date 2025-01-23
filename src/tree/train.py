@@ -4,7 +4,6 @@ from datetime import datetime
 import hydra
 import torch
 import torch.utils.tensorboard
-import wandb
 from dotenv import load_dotenv
 from hydra.utils import to_absolute_path
 from loguru import logger
@@ -12,6 +11,7 @@ from omegaconf import OmegaConf
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 
+import wandb
 from tree.data import PCTreeDataset
 from tree.models.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.models.vae_flow import FlowVAE
@@ -144,11 +144,18 @@ def train(args):
             logger.info("Early stopping...")
 
             break
+
+        if epoch % 10 == 0:
+            MODEL_CHECKPOINT_SAVE_PATH = to_absolute_path(
+                os.path.join(args.experiment_output_dir, f"{args.model}_e-{epoch}.pth")
+            )
+            torch.save(early_stopper.best_model_state, MODEL_CHECKPOINT_SAVE_PATH)
+
     logger.info("Training complete.")
 
     # Save the model
     logger.info("Saving model...")
-    MODEL_SAVE_PATH = to_absolute_path(os.path.join("models", f"{args.model}_model.pth"))
+    MODEL_SAVE_PATH = to_absolute_path(os.path.join(args.experiment_output_dir, f"{args.model}_best_model.pth"))
     torch.save(early_stopper.best_model_state, MODEL_SAVE_PATH)
 
     artifact = wandb.Artifact(
