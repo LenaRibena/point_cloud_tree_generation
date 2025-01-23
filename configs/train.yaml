@@ -9,7 +9,7 @@ val_split: 0.1
 test_split: 0.1
 
 # Training parameters
-epochs: 200
+epochs: 0
 batch_size: 64
 lr: 1e-3
 weight_decay: 1e-5
@@ -33,7 +33,7 @@ sched_mode: "linear"
 
 # Model parameters
 device: "cuda"
-model: "flow"
+model: "gaussian"
 seed: 32
 num_workers: 0
 max_grad_norm: 1.0
