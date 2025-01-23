@@ -30,6 +30,10 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
+    - name: Check GCP authentication
+      run: |
+        gcloud auth list
+
     - name: Download data from GCP_SERVICE_ACCOUNT
       run: |
         gsutil cp gs://data-tree/*.npy .
