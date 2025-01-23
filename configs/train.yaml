@@ -9,8 +9,8 @@ val_split: 0.1
 test_split: 0.1
 
 # Training parameters
-epochs: 3
-batch_size: 2
+epochs: 200
+batch_size: 64
 lr: 1e-3
 weight_decay: 1e-5
 kl_weight: 1e-1
@@ -32,7 +32,7 @@ beta_T: 0.999
 sched_mode: "linear"
 
 # Model parameters
-device: "cpu"
+device: "cuda"
 model: "flow"
 seed: 32
 num_workers: 0

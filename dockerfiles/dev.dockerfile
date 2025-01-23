@@ -11,6 +11,7 @@ RUN apt update && \
 COPY requirements.txt /trees/requirements.txt
 COPY pyproject.toml /trees/pyproject.toml
 COPY src/tree /trees/src/tree
+COPY configs /trees/configs
 
 # Install dependencie(s)
 RUN --mount=type=cache,target=~/pip/.cache pip install -r requirements.txt --no-cache-dir

@@ -26,5 +26,9 @@ dvc-gs
 wandb
 python-dotenv
 omegaconf
+tensorboard
 
 ruamel-yaml
+
+# logging
+loguru
