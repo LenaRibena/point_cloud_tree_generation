@@ -36,7 +36,9 @@ jobs:
 
     - name: Download data from GCP_SERVICE_ACCOUNT
       run: |
-        gsutil cp gs://data-tree/processed-data/*.npy .
+        gsutil cp gs://data-tree/processed-data/OptQSM_2023-01-09_17_2_18_000000.npy data/processed
+        gsutil cp gs://data-tree/processed-data/OptQSM_2023-01-09_17_2_18_000044.npy data/processed
+        gsutil cp gs://data-tree/processed-data/OptQSM_2023-01-09_17_2_18_000036.npy data/processed
 
     - name: Set up Python
       uses: actions/setup-python@v5
