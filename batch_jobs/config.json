@@ -31,7 +31,7 @@
                     },
                     {
                         "gcs": {
-                            "remotePath": "data-tree/models/"
+                            "remotePath": "models-tree/models/"
                         },
                         "mountPath": "/mnt/disks/models"
                     }
