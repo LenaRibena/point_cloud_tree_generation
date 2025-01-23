@@ -5,7 +5,7 @@
                 "runnables": [
                     {
                         "script": {
-                            "text": "# Install nvidia-container-toolkit\ncurl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \\\n  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \\\n    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \\\n    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list\nsudo apt-get update\nsudo apt-get install -y nvidia-container-toolkit\nsudo systemctl restart docker\n\n# Authenticate and run container image with gpu\ngcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin europe-west1-docker.pkg.dev\n#todo: insert giving arguments for the experiment\ndocker run -e WANDB_PROJECT=$WANDB_PROJECT \\\n  -e WANDB_ENTITY=$WANDB_ENTITY \\\n  -e WANDB_API_KEY=$WANDB_API_KEY \\\n  --volume /mnt/disks/data-tree:/trees/data/processed \\\n  --volume /mnt/disks/models:/trees/models \\\n  --gpus all \\\n  --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c \"wandb sweep configs/sweep.yaml\""
+                            "text": "# Install nvidia-container-toolkit\ncurl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \\\n  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \\\n    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \\\n    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list\nsudo apt-get update\nsudo apt-get install -y nvidia-container-toolkit\nsudo systemctl restart docker\n\n# Authenticate and run container image with gpu\ngcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin europe-west1-docker.pkg.dev\n#todo: insert giving arguments for the experiment\ndocker run -e WANDB_PROJECT=$WANDB_PROJECT \\\n  -e WANDB_ENTITY=$WANDB_ENTITY \\\n  -e WANDB_API_KEY=$WANDB_API_KEY \\\n  --volume /mnt/disks/data-tree/processed-data:/trees/data/processed/urban_tree_dataset \\\n  --volume /mnt/disks/models:/trees/models \\\n  --gpus all \\\n  --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c \"wandb sweep configs/sweep.yaml\"\n"
                         }
                     }
                 ],
@@ -14,12 +14,12 @@
                     "memoryMib": 2000
                 },
                 "maxRetryCount": 0,
-                "maxRunDuration": "86400s",
+                "maxRunDuration": "3600s",
                 "environment": {
                     "secretVariables": {
-                        "{WANDB_PROJECT}": "projects/dtu-mlops-tree/secrets/WANDB_PROJECT/versions/1",
-                        "{WANDB_API_KEY}": "projects/dtu-mlops-tree/secrets/WANDB_API_KEY/versions/1",
-                        "{WANDB_ENTITY}": "projects/dtu-mlops-tree/secrets/WANDB_ENTITY/versions/1"
+                        "WANDB_PROJECT": "projects/dtu-mlops-tree/secrets/WANDB_PROJECT/versions/1",
+                        "WANDB_API_KEY": "projects/dtu-mlops-tree/secrets/WANDB_API_KEY/versions/1",
+                        "WANDB_ENTITY": "projects/dtu-mlops-tree/secrets/WANDB_ENTITY/versions/1"
                     }
                 },
                 "volumes": [
@@ -31,7 +31,7 @@
                     },
                     {
                         "gcs": {
-                            "remotePath": "data-tree/models/"
+                            "remotePath": "models-tree/models/"
                         },
                         "mountPath": "/mnt/disks/models"
                     }

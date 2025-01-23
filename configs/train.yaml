@@ -39,7 +39,14 @@ num_workers: 0
 max_grad_norm: 1.0
 spectral_norm: false
 
+# Folder where experiments are saved to
+experiments_folder: "./models"
+
+# Debugging
 debug: false
+
+# Auto generated during runtime, will be overwritten
+experiment_output_dir: "./outputs\\2025-01-23-14-20"
 hydra:
   run:
-    dir: ./outputs
+    dir: "./outputs\\2025-01-23-14-20"
