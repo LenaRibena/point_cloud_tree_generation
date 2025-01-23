@@ -36,7 +36,7 @@ jobs:
 
     - name: Download data from GCP_SERVICE_ACCOUNT
       run: |
-        gsutil cp gs://data-tree/*.npy .
+        gsutil cp gs://data-tree/processed_data/*.npy .
 
     - name: Set up Python
       uses: actions/setup-python@v5
