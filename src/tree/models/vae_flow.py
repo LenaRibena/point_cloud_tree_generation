@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 from torch.nn import Module
 
@@ -19,20 +20,6 @@ class FlowVAE(Module):
                 num_steps=args.num_steps, beta_1=args.beta_1, beta_T=args.beta_T, mode=args.sched_mode
             ),
         )
-
-    @classmethod
-    def load(cls, path, args):
-        state = torch.load(path, weights_only=True)
-        model = cls(args)
-        model.load_state_dict(state)
-        return model
-
-    def generate(self, num_points=4096):
-        z = torch.randn(1, self.args.latent_dim)
-        return self.diffusion.sample(num_points, context=z)[0].detach().cpu().numpy()
-
-        # samples = self.sample(w, 4096)
-        # return samples
 
     def get_loss(self, x, kl_weight, writer=None, it=None):
         """
@@ -79,3 +66,29 @@ class FlowVAE(Module):
         z = self.flow(w, reverse=True).view(batch_size, -1)
         samples = self.diffusion.sample(num_points, context=z, flexibility=flexibility)
         return samples
+
+    @classmethod
+    def load(cls, path: str) -> Module:
+        from types import SimpleNamespace
+
+        state = torch.load(path, weights_only=True)
+
+        # Extract args from state (or manually)
+        args = SimpleNamespace(
+            latent_dim=state["encoder.fc3_v.weight"].shape[0],
+            residual=False,
+            latent_flow_depth=2,
+            latent_flow_hidden_dim=128,
+            num_steps=10,
+            beta_1=0.9,
+            beta_T=0.999,
+            sched_mode="linear",
+        )
+
+        model = cls(args)
+        model.load_state_dict(state)
+        return model
+
+    def generate(self, num_points: int = 4096) -> np.ndarray:
+        z = torch.randn(1, self.args.latent_dim)
+        return self.diffusion.sample(num_points, context=z)[0].detach().cpu().numpy()
