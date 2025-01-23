@@ -13,7 +13,7 @@ gcloud auth print-access-token | docker login -u oauth2accesstoken --password-st
 docker run -e WANDB_PROJECT=$WANDB_PROJECT \
   -e WANDB_ENTITY=$WANDB_ENTITY \
   -e WANDB_API_KEY=$WANDB_API_KEY \
-  --volume /mnt/disks/data-tree/processed-data:/trees/data/processed \
+  --volume /mnt/disks/data-tree/processed-data:/trees/data/processed/urban_tree_dataset \
   --volume /mnt/disks/models:/trees/models \
   --gpus all \
   --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c "wandb sweep configs/sweep.yaml"
