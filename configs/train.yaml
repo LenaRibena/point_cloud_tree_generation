@@ -2,33 +2,35 @@
 data_path:
 - "data"
 - "processed"
-- "urban_tree_dataset"
+- "urban_tree_dataset_better_sampled"
 transform:
+preload_data_into_cpu: true
+standardize_data: true
 train_split: 0.8
 val_split: 0.1
 test_split: 0.1
 
 # Training parameters
-epochs: 200
+epochs: 300
 batch_size: 64
-lr: 1e-3
-weight_decay: 1e-5
-kl_weight: 1e-1
-patience: 5
-delta: 1e-2
+lr: 2e-3
+weight_decay: 0
+kl_weight: 0.001
+patience: 30
+delta: 1e-4
 
 # Autoencoder parameters
-latent_dim: 128
+latent_dim: 256
 residual: false
 
 # Flow VAE parameters
-latent_flow_depth: 2
-latent_flow_hidden_dim: 128
+latent_flow_depth: 14
+latent_flow_hidden_dim: 256
 
 # Variance scheduler parameters
-num_steps: 10
-beta_1: 0.9
-beta_T: 0.999
+num_steps: 100
+beta_1: 0.0001
+beta_T: 0.02
 sched_mode: "linear"
 
 # Model parameters
@@ -36,7 +38,7 @@ device: "cuda"
 model: "flow"
 seed: 32
 num_workers: 0
-max_grad_norm: 1.0
+max_grad_norm: 10
 spectral_norm: false
 
 # Folder where experiments are saved to

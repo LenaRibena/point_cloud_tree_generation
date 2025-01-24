@@ -64,6 +64,12 @@ def train(args):
         device=args.device,
         transform=args.transform,
     )
+    if args.preload_data_into_cpu:
+        mean, std = dset.preload_data(standardize=args.standardize_data)
+        stats = {"mean": mean, "std": std}
+        torch.save(stats, os.path.join(args.experiment_output_dir, "data_scale_stats.pt"))
+    elif args.standardize_data:
+        logger.warning("Cannot standardize data without preloading. Skipping standardization.")
 
     train_iter, val_iter, test_iter = dset.get_train_val_test_loaders(
         train_ratio=args.train_split, val_ratio=args.val_split, batch_size=args.batch_size, num_workers=args.num_workers

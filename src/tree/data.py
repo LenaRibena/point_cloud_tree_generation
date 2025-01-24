@@ -11,7 +11,10 @@ class PCTreeDataset(Dataset):
     See tree.preprocess to process the data"""
 
     def __init__(
-        self, processed_data_path: str | Path = "data/processed/urban_tree_dataset", device="cpu", transform=None
+        self,
+        processed_data_path: str | Path = "data/processed/urban_tree_dataset",
+        device="cpu",
+        transform=None,
     ) -> None:
         # Get all data files from the specified data path folder
         self.data_path = Path(processed_data_path)
@@ -34,20 +37,41 @@ class PCTreeDataset(Dataset):
             case _:
                 raise ValueError('Invalid device. Use either "cpu" or "cuda".')
 
+        # Only defined if preloaded
+        self.point_clouds = None
+        self.mean, self.std = None, None
+
     def __len__(self) -> int:
         """Return the length of the dataset."""
         return len(self.data_files)
 
     def __getitem__(self, index: int) -> torch.Tensor:
         """Return a given sample from the dataset."""
-        file_path = self.data_files[index]
-        xyz_data = np.load(file_path)
-        data = torch.from_numpy(xyz_data)  # Note, might need to change the dtype
+        if self.point_clouds is not None:
+            data = self.point_clouds[index]
+        else:
+            file_path = self.data_files[index]
+            xyz_data = np.load(file_path)
+            data = torch.from_numpy(xyz_data)  # Note, might need to change the dtype
 
         if self.transform is not None:
             data = self.transform(data)
 
         return data
+
+    def preload_data(self, standardize: bool = True) -> tuple[torch.Tensor, torch.Tensor]:
+        point_clouds_list = []
+        for file in self.data_files:
+            point_clouds_list.append(torch.from_numpy(np.load(file)))
+
+        self.point_clouds = torch.stack(point_clouds_list, dim=0)
+
+        if standardize:
+            self.mean = self.point_clouds.view(-1, 3).mean(dim=0)
+            self.std = self.point_clouds.view(-1).std(dim=0)
+            self.point_clouds = (self.point_clouds - self.mean) / self.std
+
+        return self.mean, self.std
 
     def get_train_val_test_datasets(self, train_ratio: float, val_ratio: float):
         assert (train_ratio + val_ratio) <= 1
