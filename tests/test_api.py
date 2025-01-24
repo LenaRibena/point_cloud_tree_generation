@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from fastapi.testclient import TestClient
 
 from tree.app import app
@@ -6,6 +7,7 @@ from tree.app import app
 client = TestClient(app)
 
 
+@pytest.mark.skip(reason="This would require mounting the models.")  # type: ignore
 def test_read_generate() -> None:
     with TestClient(app) as client:
         response = client.get("/generate/flow")
