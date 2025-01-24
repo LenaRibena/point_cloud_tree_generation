@@ -379,6 +379,7 @@ The following images are from a sweep.
 <img src="figures/wandb_1.png" alt="storage" width="500"/>
 <img src="figures/wandb_2.png" alt="storage" width="500"/>
 <img src="figures/wandb_3.png" alt="storage" width="500"/>
+As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.
 
 ### Question 15
 
