@@ -1,36 +1,35 @@
-import torch
-import numpy as np
 import math
-import random
 import numbers
 import random
-from itertools import repeat
+from typing import List, Sequence, Tuple, Union
+
+import numpy as np
+import torch
 
 
 class Center(object):
     r"""Centers node positions around the origin."""
 
-    def __init__(self, attr):
+    def __init__(self, attr: list[str]) -> None:
         self.attr = attr
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         for key in self.attr:
             data[key] = data[key] - data[key].mean(dim=-2, keepdim=True)
         return data
 
-    def __repr__(self):
-        return '{}()'.format(self.__class__.__name__)
+    def __repr__(self) -> str:
+        return "{}()".format(self.__class__.__name__)
 
 
 class NormalizeScale(object):
-    r"""Centers and normalizes node positions to the interval :math:`(-1, 1)`.
-    """
+    r"""Centers and normalizes node positions to the interval :math:`(-1, 1)`."""
 
-    def __init__(self, attr):
+    def __init__(self, attr: list[str]) -> None:
         self.center = Center(attr=attr)
         self.attr = attr
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         data = self.center(data)
 
         for key in self.attr:
@@ -51,32 +50,30 @@ class FixedPoints(object):
             minimum. (default: :obj:`True`)
     """
 
-    def __init__(self, num, replace=True):
+    def __init__(self, num: int, replace: bool = True) -> None:
         self.num = num
         self.replace = replace
         # warnings.warn('FixedPoints is not deterministic')
 
-    def __call__(self, data):
-        num_nodes = data['pos'].size(0)
-        data['dense'] = data['pos']
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        num_nodes = data["pos"].size(0)
+        data["dense"] = data["pos"]
 
         if self.replace:
             choice = np.random.choice(num_nodes, self.num, replace=True)
         else:
-            choice = torch.cat([
-                torch.randperm(num_nodes)
-                for _ in range(math.ceil(self.num / num_nodes))
-            ], dim=0)[:self.num]
+            choice = torch.cat([torch.randperm(num_nodes) for _ in range(math.ceil(self.num / num_nodes))], dim=0)[
+                : self.num
+            ]
 
         for key, item in data.items():
-            if torch.is_tensor(item) and item.size(0) == num_nodes and key != 'dense':
+            if torch.is_tensor(item) and item.size(0) == num_nodes and key != "dense":
                 data[key] = item[choice]
 
         return data
 
-    def __repr__(self):
-        return '{}({}, replace={})'.format(self.__class__.__name__, self.num,
-                                           self.replace)
+    def __repr__(self) -> str:
+        return "{}({}, replace={})".format(self.__class__.__name__, self.num, self.replace)
 
 
 class LinearTransformation(object):
@@ -87,30 +84,29 @@ class LinearTransformation(object):
             corresponds to the dimensionality of node positions.
     """
 
-    def __init__(self, matrix, attr):
-        assert matrix.dim() == 2, (
-            'Transformation matrix should be two-dimensional.')
+    def __init__(self, matrix: torch.Tensor, attr: list[str]) -> None:
+        assert matrix.dim() == 2, "Transformation matrix should be two-dimensional."
         assert matrix.size(0) == matrix.size(1), (
-            'Transformation matrix should be square. Got [{} x {}] rectangular'
-            'matrix.'.format(*matrix.size()))
+            "Transformation matrix should be square. Got [{} x {}] rectangular matrix.".format(*matrix.size())
+        )
 
         self.matrix = matrix
         self.attr = attr
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         for key in self.attr:
             pos = data[key].view(-1, 1) if data[key].dim() == 1 else data[key]
 
             assert pos.size(-1) == self.matrix.size(-2), (
-                'Node position matrix and transformation matrix have incompatible '
-                'shape.')
+                "Node position matrix and transformation matrix have incompatible shape."
+            )
 
             data[key] = torch.matmul(pos, self.matrix.to(pos.dtype).to(pos.device))
 
         return data
 
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.matrix.tolist())
+    def __repr__(self) -> str:
+        return "{}({})".format(self.__class__.__name__, self.matrix.tolist())
 
 
 class RandomRotate(object):
@@ -124,15 +120,16 @@ class RandomRotate(object):
         axis (int, optional): The rotation axis. (default: :obj:`0`)
     """
 
-    def __init__(self, degrees, attr, axis=0):
-        if isinstance(degrees, numbers.Number):
-            degrees = (-abs(degrees), abs(degrees))
-        assert isinstance(degrees, (tuple, list)) and len(degrees) == 2
-        self.degrees = degrees
+    def __init__(self, degree: float, attr: list[str], axis: int = 0) -> None:
+        if isinstance(degree, numbers.Number):
+            self.degrees = (-abs(degree), abs(degree))
+        else:
+            assert isinstance(degree, (tuple, list)) and len(degree) == 2
+            self.degrees = degree
         self.axis = axis
         self.attr = attr
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         degree = math.pi * random.uniform(*self.degrees) / 180.0
         sin, cos = math.sin(degree), math.cos(degree)
 
@@ -144,52 +141,47 @@ class RandomRotate(object):
             matrix = [[cos, sin, 0], [-sin, cos, 0], [0, 0, 1]]
         return LinearTransformation(torch.tensor(matrix), attr=self.attr)(data)
 
-    def __repr__(self):
-        return '{}({}, axis={})'.format(self.__class__.__name__, self.degrees,
-                                        self.axis)
+    def __repr__(self) -> str:
+        return "{}({}, axis={})".format(self.__class__.__name__, self.degrees, self.axis)
 
 
 class AddNoise(object):
-
-    def __init__(self, std=0.01, noiseless_item_key='clean'):
+    def __init__(self, std: float = 0.01, noiseless_item_key: str = "clean") -> None:
         self.std = std
         self.key = noiseless_item_key
 
-    def __call__(self, data):
-        data[self.key] = data['pos']
-        data['pos'] = data['pos'] + torch.normal(mean=0, std=self.std, size=data['pos'].size())
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        data[self.key] = data["pos"]
+        data["pos"] = data["pos"] + torch.normal(mean=0, std=self.std, size=data["pos"].size())
         return data
 
 
 class AddRandomNoise(object):
-
-    def __init__(self, std_range=[0, 0.10], noiseless_item_key='clean'):
+    def __init__(self, std_range: list[float] = [0, 0.10], noiseless_item_key: str = "clean") -> None:
         self.std_range = std_range
         self.key = noiseless_item_key
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         noise_std = random.uniform(*self.std_range)
-        data[self.key] = data['pos']
-        data['pos'] = data['pos'] + torch.normal(mean=0, std=noise_std, size=data['pos'].size())
+        data[self.key] = data["pos"]
+        data["pos"] = data["pos"] + torch.normal(mean=0, std=noise_std, size=data["pos"].size())
         return data
 
 
 class AddNoiseForEval(object):
-
-    def __init__(self, stds=[0.0, 0.01, 0.02, 0.03, 0.05, 0.10, 0.15]):
+    def __init__(self, stds: list[float] = [0.0, 0.01, 0.02, 0.03, 0.05, 0.10, 0.15]) -> None:
         self.stds = stds
-        self.keys = ['noisy_%.2f' % s for s in stds]
+        self.keys = ["noisy_%.2f" % s for s in stds]
 
-    def __call__(self, data):
-        data['clean'] = data['pos']
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        data["clean"] = data["pos"]
         for noise_std in self.stds:
-            data['noisy_%.2f' % noise_std] = data['pos'] + torch.normal(mean=0, std=noise_std, size=data['pos'].size())
+            data["noisy_%.2f" % noise_std] = data["pos"] + torch.normal(mean=0, std=noise_std, size=data["pos"].size())
         return data
 
 
 class IdentityTransform(object):
-    
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         return data
 
 
@@ -209,19 +201,19 @@ class RandomScale(object):
             :math:`a \leq \mathrm{scale} \leq b`.
     """
 
-    def __init__(self, scales, attr):
+    def __init__(self, scales: Union[Tuple[float, float], List[float]], attr: List[str]) -> None:
         assert isinstance(scales, (tuple, list)) and len(scales) == 2
         self.scales = scales
         self.attr = attr
 
-    def __call__(self, data):
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
         scale = random.uniform(*self.scales)
         for key in self.attr:
             data[key] = data[key] * scale
         return data
 
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.scales)
+    def __repr__(self) -> str:
+        return "{}({})".format(self.__class__.__name__, self.scales)
 
 
 class RandomTranslate(object):
@@ -236,27 +228,31 @@ class RandomTranslate(object):
             range is used for each dimension.
     """
 
-    def __init__(self, translate, attr):
+    def __init__(self, translate: Union[float, int, Sequence[float]], attr: list[str]) -> None:
         self.translate = translate
         self.attr = attr
 
-    def __call__(self, data):
-        (n, dim), t = data['pos'].size(), self.translate
-        if isinstance(t, numbers.Number):
-            t = list(repeat(t, times=dim))
-        assert len(t) == dim
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        (n, dim), t = data["pos"].size(), self.translate
+
+        # If translate is a scalar (float or int), make it a sequence of length `dim`
+        if isinstance(t, (float, int)):
+            t = [float(t)] * dim
+
+        # Ensure translate has the same number of dimensions as the data
+        assert len(t) == dim, f"Translate has incompatible length. Expected {dim}, got {len(t)}."
 
         ts = []
         for d in range(dim):
-            ts.append(data['pos'].new_empty(n).uniform_(-abs(t[d]), abs(t[d])))
+            ts.append(data["pos"].new_empty(n).uniform_(-abs(t[d]), abs(t[d])))
 
         for key in self.attr:
             data[key] = data[key] + torch.stack(ts, dim=-1)
 
         return data
 
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.translate)
+    def __repr__(self) -> str:
+        return "{}({})".format(self.__class__.__name__, self.translate)
 
 
 class Rotate(object):
@@ -270,13 +266,13 @@ class Rotate(object):
         axis (int, optional): The rotation axis. (default: :obj:`0`)
     """
 
-    def __init__(self, degree, attr, axis=0):
-        self.degree = degree
+    def __init__(self, degrees: tuple[float, float], attr: list[str], axis: int = 0) -> None:
+        self.degrees = degrees
         self.axis = axis
         self.attr = attr
 
-    def __call__(self, data):
-        degree = math.pi * self.degree / 180.0
+    def __call__(self, data: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+        degree = math.pi * random.uniform(*self.degrees) / 180.0
         sin, cos = math.sin(degree), math.cos(degree)
 
         if self.axis == 0:
@@ -287,6 +283,5 @@ class Rotate(object):
             matrix = [[cos, sin, 0], [-sin, cos, 0], [0, 0, 1]]
         return LinearTransformation(torch.tensor(matrix), attr=self.attr)(data)
 
-    def __repr__(self):
-        return '{}({}, axis={})'.format(self.__class__.__name__, self.degrees,
-                                        self.axis)
+    def __repr__(self) -> str:
+        return "{}({}, axis={})".format(self.__class__.__name__, self.degrees, self.axis)

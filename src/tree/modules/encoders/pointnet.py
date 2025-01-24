@@ -1,10 +1,12 @@
+from typing import Tuple
+
 import torch
 import torch.nn.functional as F
 from torch import nn
 
 
-class PointNetEncoder(nn.Module):
-    def __init__(self, zdim, input_dim=3):
+class PointNetEncoder(nn.Module):  # type: ignore
+    def __init__(self, zdim: int, input_dim: int = 3) -> None:
         super().__init__()
         self.zdim = zdim
         self.conv1 = nn.Conv1d(input_dim, 128, 1)
@@ -30,7 +32,7 @@ class PointNetEncoder(nn.Module):
         self.fc_bn1_v = nn.BatchNorm1d(256)
         self.fc_bn2_v = nn.BatchNorm1d(128)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x = x.transpose(1, 2)
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
