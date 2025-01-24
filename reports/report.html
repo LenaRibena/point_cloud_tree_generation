@@ -159,7 +159,7 @@ pip install -e .</code></p>
 <em>concepts are important in larger projects because ... . For example, typing ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>Regarding the GitHub project, two rules were enforced using the ruleset option: 1) Pull requests needed to be reviewed by someone other than the one requesting, and 2) All code requested to be merged into main must pass all created GitHub action tests. </p>
+<p>Regarding the GitHub project, two rules were enforced using the ruleset option: 1) Pull requests needed to be reviewed by someone other than the one requesting, and 2) All code requested to be merged into main must pass all created GitHub action tests.</p>
 <p>Regarding formatting, pre-commits were implemented such that all committed code would be checked for: Trailing whitespaces, end-of-file fixer, yaml checking and added larger files. Additionally, ruff would, prior to accepting the commit, format any file to comply with rules added in the pyproject.toml. Mypy would also check for correct typing, and would have to be manually edited.</p>
 <p>In larger projects, it is important to implement rules to test for code quality and formatting, as it adds to the explainability and consistency of the code both among project members and peer review. It also ensures that any merges to main do not result in unexpected errors that were otherwise absent in earlier iterations.</p>
 <h2>Version control</h2>
@@ -203,7 +203,7 @@ corporate and increase the quality of your code.</p>
 </blockquote>
 <p>Our report created by coverage can be seen in the following figure</p>
 <p><img src="figures/coverage.png" alt="drawing" width="300"/></p>
-<p>While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically <code>None</code>. </p>
+<p>While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically <code>None</code>.</p>
 <h3>Question 9</h3>
 <blockquote>
 <p><strong>Did you workflow include using branches and pull requests? If yes, explain how. If not, explain how branches and</strong>
@@ -225,7 +225,7 @@ corporate and increase the quality of your code.</p>
 <em>pipeline</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>We used DVC for accessing our data remotely from a bucket in Google Cloud Storage. Likewise, all saved models were also linked to dvc. This was necessary for the project, as the data was too large to upload to GitHub and it made it easier to access when running Docker builds. </p>
+<p>We used DVC for accessing our data remotely from a bucket in Google Cloud Storage. Likewise, all saved models were also linked to dvc. This was necessary for the project, as the data was too large to upload to GitHub and it made it easier to access when running Docker builds.</p>
 <h3>Question 11</h3>
 <blockquote>
 <p><strong>Discuss you continuous integration setup. What kind of continuous integration are you running (unittesting,</strong>
@@ -262,7 +262,7 @@ especially the reproducibility of your experiments.</p>
 <em>We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file <code>python -m tree.train</code> or if we want to overwrite anything for specific experiments: <code>python -m tree.train epochs=40 model=flow</code> </p>
+<p>We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file <code>python -m tree.train</code> or if we want to overwrite anything for specific experiments: <code>python -m tree.train epochs=40 model=flow</code></p>
 <p>Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over <a href="src/tree/train.py">the training script</a>, and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run <code>wandb sweep configs/sweep.yaml</code>, followed by: <code>wandb agent &lt;sweep_id&gt;</code></p>
 <h3>Question 13</h3>
 <blockquote>
@@ -274,8 +274,8 @@ especially the reproducibility of your experiments.</p>
 <em>one would have to do ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>We used Hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Is anyone reading this? Setting the pytorch seed as <code>torch.manual_seed(args.seed)</code> was also done before training started. </p>
-<p>A docker image were also created for reproducibility purposes such that any current or new developer can work with the same setup. </p>
+<p>We used Hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Is anyone reading this? Setting the pytorch seed as <code>torch.manual_seed(args.seed)</code> was also done before training started.</p>
+<p>A docker image were also created for reproducibility purposes such that any current or new developer can work with the same setup.</p>
 <h3>Question 14</h3>
 <blockquote>
 <p><strong>Upload 1 to 3 screenshots that show the experiments that you have done in W&amp;B (or another experiment tracking</strong>
@@ -291,7 +291,8 @@ especially the reproducibility of your experiments.</p>
 <p>The following images are from a sweep.
 <img src="figures/wandb_1.png" alt="storage" width="500"/>
 <img src="figures/wandb_2.png" alt="storage" width="500"/>
-<img src="figures/wandb_3.png" alt="storage" width="500"/></p>
+<img src="figures/wandb_3.png" alt="storage" width="500"/>
+As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.</p>
 <h3>Question 15</h3>
 <blockquote>
 <p><strong>Docker is an important tool for creating containerized applications. Explain how you used docker in your</strong>
@@ -400,7 +401,7 @@ where the image would save the results inside the mounted models folder, making 
 <em>to the API to make it more ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>An API called <a href="src/tree/app.py">app.py</a> hosts a server that generates tree point clouds. The user can choose the generation model by specifying either <code>generate/flow</code> or <code>generate/gauss</code> in the url as seen in the <a href="src\tree\app_client.py">app_client.py</a> example usage. To avoid having to load the models upon every GET request, <code>FastAPI</code> lifespan parameter is used to store the model instances in a dictionary for later use. </p>
+<p>An API called <a href="src/tree/app.py">app.py</a> hosts a server that generates tree point clouds. The user can choose the generation model by specifying either <code>generate/flow</code> or <code>generate/gauss</code> in the url as seen in the <a href="src\tree\app_client.py">app_client.py</a> example usage. To avoid having to load the models upon every GET request, <code>FastAPI</code> lifespan parameter is used to store the model instances in a dictionary for later use.</p>
 <h3>Question 24</h3>
 <blockquote>
 <p><strong>Did you manage to deploy your API, either in locally or cloud? If not, describe why. If yes, describe how and</strong>
@@ -412,7 +413,7 @@ where the image would save the results inside the mounted models folder, making 
 <em><code>curl -X POST -F "file=@file.json"&lt;weburl&gt;</code></em></p>
 <p>Answer:</p>
 </blockquote>
-<p>Locally - couldn't be bothered. </p>
+<p>Locally - couldn't be bothered.</p>
 <h3>Question 25</h3>
 <blockquote>
 <p><strong>Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for</strong>
@@ -423,7 +424,7 @@ where the image would save the results inside the mounted models folder, making 
 <em>before the service crashed.</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>The API is extremely simple with one method taking an argument that selects either the flow or gauss model for tree generation. Load testing returned the following results: Average response time was 279.58 ms, 95th percentile response time was 360 ms for one user. </p>
+<p>The API is extremely simple with one method taking an argument that selects either the flow or gauss model for tree generation. Load testing returned the following results: Average response time was 279.58 ms, 95th percentile response time was 360 ms for one user.</p>
 <h3>Question 26</h3>
 <blockquote>
 <p><strong>Did you manage to implement monitoring of your deployed model? If yes, explain how it works. If not, explain how</strong>
@@ -486,7 +487,7 @@ where the image would save the results inside the mounted models folder, making 
 <em>The biggest challenges in the project was using ... tool to do ... . The reason for this was ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>A lot of time was initially spent on finding relevant data and papers for how to approach the problem. A lot of considerations went into how the data was distributed, and how it should be handled/preprocessed to work in a PyTorch pipeline all while not training for too long. When the pipeline was determined, the greatest struggles involved the communication between the different tools presented i.e setting up wand while using Hydra for config handling, or unit testing the data with data stored remotely. Viewed in isolation, it was mostly not the tools themselves that were difficult to set up, but more the implementation of the entire workflow such that no errors would occur. A lot of time was also spent on resolving the errors produced by mypy.  </p>
+<p>A lot of time was initially spent on finding relevant data and papers for how to approach the problem. A lot of considerations went into how the data was distributed, and how it should be handled/preprocessed to work in a PyTorch pipeline all while not training for too long. When the pipeline was determined, the greatest struggles involved the communication between the different tools presented i.e setting up wand while using Hydra for config handling, or unit testing the data with data stored remotely. Viewed in isolation, it was mostly not the tools themselves that were difficult to set up, but more the implementation of the entire workflow such that no errors would occur. A lot of time was also spent on resolving the errors produced by mypy.</p>
 <h3>Question 31</h3>
 <blockquote>
 <p><strong>State the individual contributions of each team member. This is required information from DTU, because we need to</strong>
