@@ -1,23 +1,24 @@
 import warnings
 from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split
 
 
-class PCTreeDataset(Dataset):
+class PCTreeDataset(Dataset):  # type: ignore
     """Dataset class for TreeML-Data; a multidisciplinary and multilayer urban tree dataset.
     See tree.preprocess to process the data"""
 
     def __init__(
-        self, processed_data_path: str | Path = "data/processed/urban_tree_dataset", device="cpu", transform=None
+        self,
+        processed_data_path: str | Path = "data/processed/urban_tree_dataset",
+        device: str = "cpu",
     ) -> None:
         # Get all data files from the specified data path folder
         self.data_path = Path(processed_data_path)
         self.data_files = list(self.data_path.rglob("*.npy"))
-
-        self.transform = transform
 
         # Configure device
         match device:
@@ -49,7 +50,7 @@ class PCTreeDataset(Dataset):
 
         return data
 
-    def get_train_val_test_datasets(self, train_ratio: float, val_ratio: float):
+    def get_train_val_test_datasets(self, train_ratio: float, val_ratio: float) -> Tuple[Dataset, Dataset, Dataset]:
         assert (train_ratio + val_ratio) <= 1
         train_size = int(len(self) * train_ratio)
         val_size = int(len(self) * val_ratio)
@@ -58,7 +59,9 @@ class PCTreeDataset(Dataset):
         train_set, val_set, test_set = random_split(self, [train_size, val_size, test_size])
         return train_set, val_set, test_set
 
-    def get_train_val_test_loaders(self, train_ratio: float, val_ratio: float, batch_size: int, num_workers: int):
+    def get_train_val_test_loaders(
+        self, train_ratio: float, val_ratio: float, batch_size: int, num_workers: int
+    ) -> Tuple[DataLoader, DataLoader, DataLoader]:
         train_set, val_set, test_set = self.get_train_val_test_datasets(train_ratio, val_ratio)
 
         train_loader = DataLoader(train_set, batch_size, shuffle=True, num_workers=num_workers)
@@ -73,10 +76,7 @@ if __name__ == "__main__":
     train_loader, val_loader, test_loader = tree_dataset.get_train_val_test_loaders(
         train_ratio=0.8, val_ratio=0.1, batch_size=32, num_workers=4
     )
-    # print length of each loader
-    # print(len(train_loader), len(val_loader), len(test_loader))
 
-    # print shape of sample data from train_loader
     for data in train_loader:
         print(data.shape)
         break

@@ -1,13 +1,16 @@
+import logging
 import types
+from argparse import Namespace
+from typing import Callable, Optional, Sequence, Tuple, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
-class CouplingLayer(nn.Module):
-
-    def __init__(self, d, intermediate_dim, swap=False):
-        nn.Module.__init__(self)
+class CouplingLayer(nn.Module):  # type: ignore
+    def __init__(self, d: int, intermediate_dim: int, swap: bool = False) -> None:
+        super().__init__()
         self.d = d - (d // 2)
         self.swap = swap
         self.net_s_t = nn.Sequential(
@@ -18,28 +21,27 @@ class CouplingLayer(nn.Module):
             nn.Linear(intermediate_dim, (d - self.d) * 2),
         )
 
-    def forward(self, x, logpx=None, reverse=False):
-
+    def forward(self, x: torch.Tensor, logpx: Optional[float] = None, reverse: bool = False) -> torch.Tensor:
         if self.swap:
-            x = torch.cat([x[:, self.d:], x[:, :self.d]], 1)
+            x = torch.cat([x[:, self.d :], x[:, : self.d]], 1)
 
         in_dim = self.d
         out_dim = x.shape[1] - self.d
 
         s_t = self.net_s_t(x[:, :in_dim])
-        scale = torch.sigmoid(s_t[:, :out_dim] + 2.)
+        scale = torch.sigmoid(s_t[:, :out_dim] + 2.0)
         shift = s_t[:, out_dim:]
 
         logdetjac = torch.sum(torch.log(scale).view(scale.shape[0], -1), 1, keepdim=True)
 
         if not reverse:
-            y1 = x[:, self.d:] * scale + shift
+            y1 = x[:, self.d :] * scale + shift
             delta_logp = -logdetjac
         else:
-            y1 = (x[:, self.d:] - shift) / scale
+            y1 = (x[:, self.d :] - shift) / scale
             delta_logp = logdetjac
 
-        y = torch.cat([x[:, :self.d], y1], 1) if not self.swap else torch.cat([y1, x[:, :self.d]], 1)
+        y = torch.cat([x[:, : self.d], y1], 1) if not self.swap else torch.cat([y1, x[:, : self.d]], 1)
 
         if logpx is None:
             return y
@@ -47,15 +49,16 @@ class CouplingLayer(nn.Module):
             return y, logpx + delta_logp
 
 
-class SequentialFlow(nn.Module):
-    """A generalized nn.Sequential container for normalizing flows.
-    """
+class SequentialFlow(nn.Module):  # type: ignore
+    """A generalized nn.Sequential container for normalizing flows."""
 
-    def __init__(self, layersList):
+    def __init__(self, layersList: Sequence[CouplingLayer]) -> None:
         super(SequentialFlow, self).__init__()
         self.chain = nn.ModuleList(layersList)
 
-    def forward(self, x, logpx=None, reverse=False, inds=None):
+    def forward(
+        self, x: torch.Tensor, logpx: Optional[float] = None, reverse: bool = False, inds: Optional[range] = None
+    ) -> Union[torch.Tensor, Tuple[torch.Tensor, float]]:
         if inds is None:
             if reverse:
                 inds = range(len(self.chain) - 1, -1, -1)
@@ -72,7 +75,7 @@ class SequentialFlow(nn.Module):
             return x, logpx
 
 
-def build_latent_flow(args):
+def build_latent_flow(args: Namespace) -> SequentialFlow:
     chain = []
     for i in range(args.latent_flow_depth):
         chain.append(CouplingLayer(args.latent_dim, args.latent_flow_hidden_dim, swap=(i % 2 == 0)))
@@ -87,25 +90,26 @@ POWER_ITERATION_FN = "spectral_norm_power_iteration"
 
 
 class SpectralNorm(object):
-    def __init__(self, name='weight', dim=0, eps=1e-12):
+    def __init__(self, name: str = "weight", dim: int = 0, eps: float = 1e-12) -> None:
         self.name = name
         self.dim = dim
         self.eps = eps
 
-    def compute_weight(self, module, n_power_iterations):
+    def compute_weight(self, module: nn.Module, n_power_iterations: int) -> None:
         if n_power_iterations < 0:
             raise ValueError(
-                'Expected n_power_iterations to be non-negative, but '
-                'got n_power_iterations={}'.format(n_power_iterations)
+                "Expected n_power_iterations to be non-negative, but got n_power_iterations={}".format(
+                    n_power_iterations
+                )
             )
 
-        weight = getattr(module, self.name + '_orig')
-        u = getattr(module, self.name + '_u')
-        v = getattr(module, self.name + '_v')
+        weight = getattr(module, self.name + "_orig")
+        u = getattr(module, self.name + "_u")
+        v = getattr(module, self.name + "_v")
         weight_mat = weight
         if self.dim != 0:
             # permute dim to front
-            weight_mat = weight_mat.permute(self.dim, * [d for d in range(weight_mat.dim()) if d != self.dim])
+            weight_mat = weight_mat.permute(self.dim, *[d for d in range(weight_mat.dim()) if d != self.dim])
         height = weight_mat.size(0)
         weight_mat = weight_mat.reshape(height, -1)
         with torch.no_grad():
@@ -115,37 +119,38 @@ class SpectralNorm(object):
                 # This power iteration produces approximations of `u` and `v`.
                 v = F.normalize(torch.matmul(weight_mat.t(), u), dim=0, eps=self.eps)
                 u = F.normalize(torch.matmul(weight_mat, v), dim=0, eps=self.eps)
-        setattr(module, self.name + '_u', u)
-        setattr(module, self.name + '_v', v)
+        setattr(module, self.name + "_u", u)
+        setattr(module, self.name + "_v", v)
 
         sigma = torch.dot(u, torch.matmul(weight_mat, v))
         weight = weight / sigma
         setattr(module, self.name, weight)
 
-    def remove(self, module):
+    def remove(self, module: nn.Module) -> None:
         weight = getattr(module, self.name)
         delattr(module, self.name)
-        delattr(module, self.name + '_u')
-        delattr(module, self.name + '_orig')
+        delattr(module, self.name + "_u")
+        delattr(module, self.name + "_orig")
         module.register_parameter(self.name, torch.nn.Parameter(weight))
 
-    def get_update_method(self, module):
-        def update_fn(module, n_power_iterations):
+    def get_update_method(self, module: nn.Module) -> Callable[[nn.Module, int], None]:
+        def update_fn(module: nn.Module, n_power_iterations: int) -> None:
             self.compute_weight(module, n_power_iterations)
 
         return update_fn
 
-    def __call__(self, module, unused_inputs):
+    # def __call__(self, module, unused_inputs):
+    def __call__(self, module: nn.Module, unused_inputs: Tuple[torch.Tensor]) -> None:
         del unused_inputs
         self.compute_weight(module, n_power_iterations=0)
 
         # requires_grad might be either True or False during inference.
         if not module.training:
-            r_g = getattr(module, self.name + '_orig').requires_grad
+            r_g = getattr(module, self.name + "_orig").requires_grad
             setattr(module, self.name, getattr(module, self.name).detach().requires_grad_(r_g))
 
     @staticmethod
-    def apply(module, name, dim, eps):
+    def apply(module: nn.Module, name: str, dim: int, eps: float) -> "SpectralNorm":
         fn = SpectralNorm(name, dim, eps)
         weight = module._parameters[name]
         height = weight.size(dim)
@@ -170,7 +175,9 @@ class SpectralNorm(object):
         return fn
 
 
-def inplace_spectral_norm(module, name='weight', dim=None, eps=1e-12):
+def inplace_spectral_norm(
+    module: nn.Module, name: str = "weight", dim: Optional[int] = None, eps: float = 1e-12
+) -> nn.Module:
     r"""Applies spectral normalization to a parameter in the given module.
     .. math::
          \mathbf{W} = \dfrac{\mathbf{W}}{\sigma(\mathbf{W})} \\
@@ -211,7 +218,7 @@ def inplace_spectral_norm(module, name='weight', dim=None, eps=1e-12):
     return module
 
 
-def remove_spectral_norm(module, name='weight'):
+def remove_spectral_norm(module: nn.Module, name: str = "weight") -> nn.Module:
     r"""Removes the spectral normalization reparameterization from a module.
     Args:
         module (nn.Module): containing module
@@ -229,15 +236,17 @@ def remove_spectral_norm(module, name='weight'):
     raise ValueError("spectral_norm of '{}' not found in {}".format(name, module))
 
 
-def add_spectral_norm(model, logger=None):
+# def add_spectral_norm(model: nn.Module, logger=None) -> None:
+def add_spectral_norm(model: nn.Module, logger: Optional[logging.Logger] = None) -> None:
     """Applies spectral norm to all modules within the scope of a CNF."""
 
-    def apply_spectral_norm(module):
-        if 'weight' in module._parameters:
-            if logger: logger.info("Adding spectral norm to {}".format(module))
-            inplace_spectral_norm(module, 'weight')
+    def apply_spectral_norm(module: nn.Module) -> None:
+        if "weight" in module._parameters:
+            if logger:
+                logger.info("Adding spectral norm to {}".format(module))
+            inplace_spectral_norm(module, "weight")
 
-    def find_coupling_layer(module):
+    def find_coupling_layer(module: nn.Module) -> None:
         if isinstance(module, CouplingLayer):
             module.apply(apply_spectral_norm)
         else:
@@ -247,9 +256,8 @@ def add_spectral_norm(model, logger=None):
     find_coupling_layer(model)
 
 
-def spectral_norm_power_iteration(model, n_power_iterations=1):
-
-    def recursive_power_iteration(module):
+def spectral_norm_power_iteration(model: nn.Module, n_power_iterations: int = 1) -> None:
+    def recursive_power_iteration(module: nn.Module) -> None:
         if hasattr(module, POWER_ITERATION_FN):
             getattr(module, POWER_ITERATION_FN)(n_power_iterations)
 

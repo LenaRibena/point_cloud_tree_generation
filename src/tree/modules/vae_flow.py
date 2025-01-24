@@ -1,27 +1,30 @@
+from argparse import Namespace
+from typing import Any, Optional
+
 import numpy as np
 import torch
 from torch.nn import Module
 
-from tree.models.common import gaussian_entropy, reparameterize_gaussian, standard_normal_logprob, truncated_normal_
-from tree.models.diffusion import DiffusionPoint, PointwiseNet, VarianceSchedule
-from tree.models.encoders.pointnet import PointNetEncoder
-from tree.models.flow import build_latent_flow
+from tree.modules.common import gaussian_entropy, reparameterize_gaussian, standard_normal_logprob, truncated_normal_
+from tree.modules.diffusion import DiffusionPoint, PointwiseNet, VarianceSchedule
+from tree.modules.encoders.pointnet import PointNetEncoder
+from tree.modules.flow import build_latent_flow
 
 
-class FlowVAE(Module):
-    def __init__(self, args):
+class FlowVAE(Module):  # type: ignore
+    def __init__(self, args: Namespace) -> None:
         super().__init__()
         self.args = args
         self.encoder = PointNetEncoder(args.latent_dim)
         self.flow = build_latent_flow(args)
         self.diffusion = DiffusionPoint(
-            net=PointwiseNet(point_dim=3, context_dim=args.latent_dim, residual=args.residual),
+            net=PointwiseNet(context_dim=args.latent_dim, residual=args.residual),
             var_sched=VarianceSchedule(
                 num_steps=args.num_steps, beta_1=args.beta_1, beta_T=args.beta_T, mode=args.sched_mode
             ),
         )
 
-    def get_loss(self, x, kl_weight, writer=None, it=None):
+    def get_loss(self, x: torch.Tensor, kl_weight: float, writer: Any = None, it: Any = None) -> torch.Tensor:
         """
         Args:
             x:  Input point clouds, (B, N, d).
@@ -58,7 +61,9 @@ class FlowVAE(Module):
 
         return loss
 
-    def sample(self, w, num_points, flexibility, truncate_std=None):
+    def sample(
+        self, w: torch.Tensor, num_points: int, flexibility: float, truncate_std: Optional[float] = None
+    ) -> np.ndarray:
         batch_size, _ = w.size()
         if truncate_std is not None:
             w = truncated_normal_(w, mean=0, std=1, trunc_std=truncate_std)
@@ -68,13 +73,11 @@ class FlowVAE(Module):
         return samples
 
     @classmethod
-    def load(cls, path: str) -> Module:
-        from types import SimpleNamespace
-
+    def load(cls, path: str) -> "FlowVAE":
         state = torch.load(path, weights_only=True)
 
         # Extract args from state (or manually)
-        args = SimpleNamespace(
+        args = Namespace(
             latent_dim=state["encoder.fc3_v.weight"].shape[0],
             residual=False,
             latent_flow_depth=2,

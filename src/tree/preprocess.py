@@ -1,24 +1,22 @@
 from pathlib import Path
+from typing import Any, Dict
 
 import hydra
 import numpy as np
 import pandas as pd
 import tqdm
 from hydra.utils import to_absolute_path
+from omegaconf import DictConfig
 
 from tree.utils.preprocess_utils import generate_cylinder_points
 
 
-class DataPreprocessor:
-    def preprocess(raw_data_path: Path, output_folder: Path, *, recursive_search: bool = False):
-        raise NotImplementedError("Subclasses must implement this method")
-
-
-class UrbanTreeDataPreprocessor(DataPreprocessor):
-    def __init__(self, conf) -> None:
+class UrbanTreeDataPreprocessor:
+    def __init__(self, conf: Dict[str, Any]) -> None:
         self.conf = conf
 
-    def sample_cylinder_points(self, csv_file: Path, total_points: int, nr_cylinders: int = 1024) -> np.array:
+    @staticmethod
+    def sample_cylinder_points(csv_file: Path, total_points: int, nr_cylinders: int = 1024) -> np.ndarray:
         """
         Generate a point cloud from cylinders described in a CSV file.
 
@@ -41,16 +39,15 @@ class UrbanTreeDataPreprocessor(DataPreprocessor):
         df["scaled_area"] = np.sqrt(df["surface_area"])
         df["num_points"] = (df["scaled_area"] / df["scaled_area"].sum() * total_points).astype(int)
 
-        point_cloud = []
+        points = []
         for _, row in df.iterrows():
             if row["num_points"] > 0:
                 start = np.array([row["start_x"], row["start_y"], row["start_z"]])
                 axis = np.array([row["axis_x"], row["axis_y"], row["axis_z"]])
-                points = generate_cylinder_points(start, axis, row["length"], row["radius"], row["num_points"])
-                point_cloud.append(points)
+                points.append(generate_cylinder_points(start, axis, row["length"], row["radius"], row["num_points"]))
 
         # Combine all points into a single array
-        point_cloud = np.vstack(point_cloud)
+        point_cloud = np.vstack(points)
 
         # If the total number of points exceeds the target, randomly downsample
         if len(point_cloud) > total_points:
@@ -59,7 +56,9 @@ class UrbanTreeDataPreprocessor(DataPreprocessor):
 
         return point_cloud
 
-    def preprocess(self, raw_data_path: str | Path, output_folder: str | Path, *, recursive_search: bool = False):
+    def preprocess(
+        self, raw_data_path: str | Path, output_folder: str | Path, *, recursive_search: bool = False
+    ) -> None:
         # Convert to Path objects
         raw_data_path = Path(raw_data_path)
         output_folder = Path(output_folder)
@@ -69,26 +68,27 @@ class UrbanTreeDataPreprocessor(DataPreprocessor):
         if not csv_files:
             raise ValueError("No CSV files found in the specified path")
         elif recursive_search:
-            csv_files = list(csv_files)
-            if len(set([csv_file.stem for csv_file in csv_files])) != len(csv_files):
+            if len(set([csv_file.stem for csv_file in csv_files])) != len(list(csv_files)):
                 raise ValueError("Duplicate file names found, please ensure all file names are unique!")
 
         for csv_file in tqdm.tqdm(csv_files, desc="Processing CSV files"):
             sampled_points = self.sample_cylinder_points(
-                csv_file, total_points=self.conf.nr_points, nr_cylinders=self.conf.nr_cylinders
+                csv_file, total_points=self.conf["nr_points"], nr_cylinders=self.conf["nr_cylinders"]
             )
             np.save(output_folder / f"{csv_file.stem}.npy", sampled_points)
         print("Preprocessing completed, saved to:", output_folder)
 
 
-@hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="preprocess")
-def main(conf):
-    match conf.dataset_name:
+@hydra.main(version_base="1.2", config_path=to_absolute_path("configs"), config_name="preprocess")  # type: ignore
+def main(conf: DictConfig) -> None:
+    match conf["dataset_name"]:
         case "urban_tree":
-            preprocessor = UrbanTreeDataPreprocessor(conf.urban_tree_conf)
-            preprocessor.preprocess(conf.raw_data_path, conf.output_folder, recursive_search=conf.recursive_search)
+            preprocessor = UrbanTreeDataPreprocessor(conf["urban_tree_conf"])
+            preprocessor.preprocess(
+                conf["raw_data_path"], conf["output_folder"], recursive_search=conf["recursive_search"]
+            )
         case _:
-            raise ValueError(f"Invalid dataset name: {conf.dataset_name}")
+            raise ValueError(f"Invalid dataset name: {conf['dataset_name']}")
 
 
 if __name__ == "__main__":

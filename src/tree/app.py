@@ -1,18 +1,17 @@
-from collections.abc import Generator
+from contextlib import asynccontextmanager
 from enum import Enum
+from typing import AsyncGenerator, List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from tree.models.vae_flow import FlowVAE
-from tree.models.vae_gaussian import GaussianVAE
+from tree.modules.vae_flow import FlowVAE
+from tree.modules.vae_gaussian import GaussianVAE
 
 # See s7_deployment\exercise_files\fastapi_solution.py
 # and s8_monitoring\exercise_files\iris_fastapi_solution.py
 # and s8_monitoring\exercise_files\sentiment_api.py
 # and s8_monitoring\exercise_files\sentiment_client.py
-
-models: dict[str, FlowVAE | GaussianVAE] = {}
 
 
 class ModelEnum(Enum):
@@ -20,11 +19,15 @@ class ModelEnum(Enum):
     gauss = "gauss"
 
 
-class GenerationOutput(BaseModel):
-    tree: list[list[float]]
+models: dict[ModelEnum, FlowVAE | GaussianVAE] = {}
 
 
-def lifespan(app) -> Generator[None]:
+class GenerationOutput(BaseModel):  # type: ignore
+    tree: List[List[float]]
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Load generator."""
     models[ModelEnum.flow] = FlowVAE.load("models/flow_model.pth")
     models[ModelEnum.gauss] = GaussianVAE.load("models/gaussian_model.pth")
@@ -37,7 +40,7 @@ def lifespan(app) -> Generator[None]:
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/generate/{item_id}")
-def generate(item_id: ModelEnum = ModelEnum.flow):
+@app.get("/generate/{item_id}")  # type: ignore
+def generate(item_id: ModelEnum = ModelEnum.flow) -> GenerationOutput:
     tree = models[item_id].generate()
     return GenerationOutput(tree=tree.tolist())

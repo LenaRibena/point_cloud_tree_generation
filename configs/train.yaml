@@ -46,7 +46,7 @@ experiments_folder: "./models"
 debug: false
 
 # Auto generated during runtime, will be overwritten
-experiment_output_dir: "./outputs\\2025-01-23-14-20"
+experiment_output_dir: "./models\\2025-01-24-11-46"
 hydra:
   run:
-    dir: "./outputs\\2025-01-23-14-20"
+    dir: "./models\\2025-01-24-11-46"

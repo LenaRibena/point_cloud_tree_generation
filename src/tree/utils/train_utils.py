@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Any, Optional
 
 import torch
 from ruamel.yaml import YAML
@@ -36,7 +37,7 @@ def update_hydra_config(config_path: str) -> bool:
     with open(config_path, "w") as file:
         yaml.dump(config, file)
 
-    return debug
+    return bool(debug)
 
 
 def equal_batch_size(batch: torch.Tensor) -> torch.Tensor:
@@ -54,12 +55,10 @@ def equal_batch_size(batch: torch.Tensor) -> torch.Tensor:
     min_points = min(item.shape[0] for item in batch)
 
     # Downsample each point cloud randomly to the smallest number of points
-    batch = [item[torch.randperm(item.shape[0])[:min_points]] for item in batch]
+    downsampled_batch = [item[torch.randperm(item.shape[0])[:min_points]] for item in batch]
 
     # Stack the batch
-    batch = torch.stack(batch)
-
-    return batch
+    return torch.stack(downsampled_batch)
 
 
 class EarlyStopper:
@@ -77,12 +76,12 @@ class EarlyStopper:
         """
         self.patience = patience
         self.delta = delta
-        self.best_score = None
+        self.best_score: Optional[float] = None
         self.early_stop = False
         self.counter = 0
-        self.best_model_state = None
+        self.best_model_state: Optional[dict[str, Any]] = None
 
-    def __call__(self, val_loss: float, model: torch.nn.Module):
+    def __call__(self, val_loss: float, model: torch.nn.Module) -> None:
         score = -val_loss
         if self.best_score is None:
             self.best_score = score
@@ -96,5 +95,8 @@ class EarlyStopper:
             self.best_model_state = model.state_dict()
             self.counter = 0
 
-    def load_best_model(self, model: torch.nn.Module):
-        model.load_state_dict(self.best_model_state)
+    def load_best_model(self, model: torch.nn.Module) -> None:
+        if self.best_model_state is not None:
+            model.load_state_dict(self.best_model_state)
+        else:
+            raise ValueError("No best model found.")
