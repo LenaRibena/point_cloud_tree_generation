@@ -15,15 +15,13 @@ class UrbanTreeDataPreprocessor:
     def __init__(self, conf: Dict[str, Any]) -> None:
         self.conf = conf
 
-    @staticmethod
-    def sample_cylinder_points(csv_file: Path, total_points: int, nr_cylinders: int = 1024) -> np.ndarray:
+    def sample_cylinders(self, csv_file: str | Path, total_points: int, nr_cylinders: int = 1024) -> np.ndarray:
         """
         Generate a point cloud from cylinders described in a CSV file.
 
         Parameters:
             csv_file (str): Path to the CSV file.
             total_points (int): Total number of points to sample.
-            nr_cylinders (int): Number of cylinders to sample from.
 
         Returns:
             np.array: A Nx3 array of sampled points.
@@ -38,6 +36,18 @@ class UrbanTreeDataPreprocessor:
         # Determine the number of points per cylinder proportionally to its surface area
         df["scaled_area"] = np.sqrt(df["surface_area"])
         df["num_points"] = (df["scaled_area"] / df["scaled_area"].sum() * total_points).astype(int)
+
+        # Calculate the rounding error
+        difference = total_points - df["num_points"].sum()
+
+        # Distribute the remaining points
+        if difference != 0:
+            # Sort cylinders by scaled_area fractional part (largest errors first)
+            adjustment_indices = np.argsort(-(df["scaled_area"] % 1))
+
+            # Apply the adjustment in one go
+            adjustment_mask = adjustment_indices[: abs(difference)]
+            df.loc[adjustment_mask, "num_points"] += np.sign(difference)
 
         points = []
         for _, row in df.iterrows():
@@ -72,8 +82,8 @@ class UrbanTreeDataPreprocessor:
                 raise ValueError("Duplicate file names found, please ensure all file names are unique!")
 
         for csv_file in tqdm.tqdm(csv_files, desc="Processing CSV files"):
-            sampled_points = self.sample_cylinder_points(
-                csv_file, total_points=self.conf["nr_points"], nr_cylinders=self.conf["nr_cylinders"]
+            sampled_points = self.sample_cylinders(
+                csv_file, total_points=self.conf.nr_points, nr_cylinders=self.conf.nr_cylinders
             )
             np.save(output_folder / f"{csv_file.stem}.npy", sampled_points)
         print("Preprocessing completed, saved to:", output_folder)

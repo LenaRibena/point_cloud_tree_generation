@@ -5,7 +5,6 @@ from datetime import datetime
 import hydra
 import torch
 import torch.utils.tensorboard
-import wandb
 from dotenv import load_dotenv
 from hydra.utils import to_absolute_path
 from loguru import logger
@@ -13,6 +12,7 @@ from omegaconf import OmegaConf
 from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 
+import wandb
 from tree.data import PCTreeDataset
 from tree.modules.flow import add_spectral_norm, spectral_norm_power_iteration
 from tree.modules.vae_flow import FlowVAE
@@ -64,6 +64,12 @@ def train(args: Namespace) -> None:
         processed_data_path=to_absolute_path(os.path.join(*args.data_path)),
         device=args.device,
     )
+    if args.preload_data_into_cpu:
+        mean, std = dset.preload_data(standardize=args.standardize_data)
+        stats = {"mean": mean, "std": std}
+        torch.save(stats, os.path.join(args.experiment_output_dir, "data_scale_stats.pt"))
+    elif args.standardize_data:
+        logger.warning("Cannot standardize data without preloading. Skipping standardization.")
 
     train_iter, val_iter, test_iter = dset.get_train_val_test_loaders(
         train_ratio=args.train_split, val_ratio=args.val_split, batch_size=args.batch_size, num_workers=args.num_workers
