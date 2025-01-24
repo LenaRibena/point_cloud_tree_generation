@@ -57,8 +57,9 @@ jobs:
         pip install --use-pep517 -r requirements_dev.txt
         pip install -e .
 
-    - name: Test with pytest
+    - name: Test with pytest and coverage
       run: |
-        pytest tests/ -v
+        coverage run -m pytest tests/
+        coverage report -m
       env:
         WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
