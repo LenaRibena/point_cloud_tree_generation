@@ -259,7 +259,7 @@ For the api, we have tested:
 
 Our report created by coverage can be seen in the following figure
 
-<img src="figures/coverage.png" alt="drawing" width="300"/>
+![my_image](figures/coverage.png)
 
 While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically ``None``.
 
@@ -376,9 +376,10 @@ A docker image were also created for reproducibility purposes such that any curr
 > Answer:
 
 The following images are from a sweep.
-<img src="figures/wandb_1.png" alt="storage" width="500"/>
-<img src="figures/wandb_2.png" alt="storage" width="500"/>
-<img src="figures/wandb_3.png" alt="storage" width="500"/>
+![my_image](figures/wandb_1.png)
+![my_image](figures/wandb_2.png)
+![my_image](figures/wandb_3.png)
+
 As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.
 
 ### Question 15
@@ -458,7 +459,8 @@ We have been using the VS Code debugger mainly and in some cases used the pdb Py
 > Answer:
 
 We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`, but unfortunately these resources weren't available:
-<img src="figures/job_no_gpu.png" alt="no gpu" width="800"/>
+![my_image](figures/job_no_gpu.png)
+
 So we ended up trying to do it over CPU with the machine `e2-standard-4`, which took more than 30 minutes per epoch and in the end we decided to train locally.
 
 ### Question 19
@@ -468,7 +470,7 @@ So we ended up trying to do it over CPU with the machine `e2-standard-4`, which 
 >
 > Answer:
 
-<img src="figures/storage_bucket.png" alt="storage" width="800"/>
+![my_image](figures/storage_bucket.png)
 
 ### Question 20
 
@@ -477,7 +479,7 @@ So we ended up trying to do it over CPU with the machine `e2-standard-4`, which 
 >
 > Answer:
 
-<img src="figures/artifact_reg.png" alt="artifact" width="800"/>
+![my_image](figures/artifact_reg.png)
 
 ### Question 21
 
@@ -486,7 +488,7 @@ So we ended up trying to do it over CPU with the machine `e2-standard-4`, which 
 >
 > Answer:
 
-<img src="figures/cloud_build.png" alt="build" width="800"/>
+![my_image](figures/cloud_build.png)
 
 ### Question 22
 

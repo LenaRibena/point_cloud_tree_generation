@@ -202,7 +202,7 @@ corporate and increase the quality of your code.</p>
 <p>Answer:</p>
 </blockquote>
 <p>Our report created by coverage can be seen in the following figure</p>
-<p><img src="figures/coverage.png" alt="drawing" width="300"/></p>
+<p><img alt="my_image" src="figures/coverage.png" /></p>
 <p>While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically <code>None</code>.</p>
 <h3>Question 9</h3>
 <blockquote>
@@ -289,10 +289,10 @@ especially the reproducibility of your experiments.</p>
 <p>Answer:</p>
 </blockquote>
 <p>The following images are from a sweep.
-<img src="figures/wandb_1.png" alt="storage" width="500"/>
-<img src="figures/wandb_2.png" alt="storage" width="500"/>
-<img src="figures/wandb_3.png" alt="storage" width="500"/>
-As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.</p>
+<img alt="my_image" src="figures/wandb_1.png" />
+<img alt="my_image" src="figures/wandb_2.png" />
+<img alt="my_image" src="figures/wandb_3.png" /></p>
+<p>As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.</p>
 <h3>Question 15</h3>
 <blockquote>
 <p><strong>Docker is an important tool for creating containerized applications. Explain how you used docker in your</strong>
@@ -352,29 +352,29 @@ Where <code>/mnt/disks/data-tree/processed-data</code> would be the location whi
 <p>Answer:</p>
 </blockquote>
 <p>We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the <a href="batch_jobs/config.json">configurations</a> given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine <code>n1-standard-2</code> with the GPU <code>nvidia-tesla-t4</code>, but unfortunately these resources weren't available:
-<img src="figures/job_no_gpu.png" alt="no gpu" width="800"/>
-So we ended up trying to do it over CPU with the machine <code>e2-standard-4</code>, which took more than 30 minutes per epoch and in the end we decided to train locally.</p>
+<img alt="my_image" src="figures/job_no_gpu.png" /></p>
+<p>So we ended up trying to do it over CPU with the machine <code>e2-standard-4</code>, which took more than 30 minutes per epoch and in the end we decided to train locally.</p>
 <h3>Question 19</h3>
 <blockquote>
 <p><strong>Insert 1-2 images of your GCP bucket, such that we can see what data you have stored in it.</strong>
 <strong>You can take inspiration from <a href="figures/bucket.png">this figure</a>.</strong></p>
 <p>Answer:</p>
 </blockquote>
-<p><img src="figures/storage_bucket.png" alt="storage" width="800"/></p>
+<p><img alt="my_image" src="figures/storage_bucket.png" /></p>
 <h3>Question 20</h3>
 <blockquote>
 <p><strong>Upload 1-2 images of your GCP artifact registry, such that we can see the different docker images that you have</strong>
 <strong>stored. You can take inspiration from <a href="figures/registry.png">this figure</a>.</strong></p>
 <p>Answer:</p>
 </blockquote>
-<p><img src="figures/artifact_reg.png" alt="artifact" width="800"/></p>
+<p><img alt="my_image" src="figures/artifact_reg.png" /></p>
 <h3>Question 21</h3>
 <blockquote>
 <p><strong>Upload 1-2 images of your GCP cloud build history, so we can see the history of the images that have been build in</strong>
 <strong>your project. You can take inspiration from <a href="figures/build.png">this figure</a>.</strong></p>
 <p>Answer:</p>
 </blockquote>
-<p><img src="figures/cloud_build.png" alt="build" width="800"/></p>
+<p><img alt="my_image" src="figures/cloud_build.png" /></p>
 <h3>Question 22</h3>
 <blockquote>
 <p><strong>Did you manage to train your model in the cloud using either the Engine or Vertex AI? If yes, explain how you did</strong>
