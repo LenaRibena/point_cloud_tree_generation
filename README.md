@@ -12,7 +12,7 @@ TODO INSERT IMAGES
 
 *Image description: A data sample from the dataset. It contains the point cloud (left) along with the corresponding quantative structure model with the fitted cylinders. (right)*
 
-The model chosen to tackle this particular task is the one presented in [Diffusion Probabilistic Models for 3D Point Cloud Generation](https://arxiv.org/abs/2103.01458) where a PointNet is trained to encode pointclouds into a sort of shape latent space distribution which the diffusion model conditions on and denoises back into a point cloud. When generating new trees, a gaussian N(0,I) would diffused.
+The model chosen to tackle this particular task is the one presented in [Diffusion Probabilistic Models for 3D Point Cloud Generation](https://arxiv.org/abs/2103.01458) where a PointNet is trained to encode pointclouds into a sort of shape latent space distribution which the diffusion model conditions on and denoises back into a point cloud. When generating new trees, a gaussian $N(0,I)$ is diffused.
 
 Since the tree pointcloud dataset had 100.000s of points, they were downsampled by using the corresponding TreeQSM model, filtering out cylinders with low radius and prioritising branch orders.
 
@@ -25,48 +25,63 @@ Since the tree pointcloud dataset had 100.000s of points, they were downsampled 
 
 The directory structure of the project looks like this:
 ```txt
+├── .devcontainer/
+├── .dvc/
 ├── .github/                  # Github actions and dependabot
 │   ├── dependabot.yaml
 │   └── workflows/
-│       └── tests.yaml
+│   │   └── tests.yaml
+├── batch_jobs/
 ├── configs/                  # Configuration files
+│   ├── preprocess.yaml
+│   ├── sweep.yaml
+│   └── train.yaml
 ├── data/                     # Data directory
 │   ├── processed
 │   └── raw
 ├── dockerfiles/              # Dockerfiles
-│   ├── api.Dockerfile
 │   └── train.Dockerfile
 ├── docs/                     # Documentation
 │   ├── mkdocs.yml
 │   └── source/
-│       └── index.md
+│   │   └── index.md
 ├── models/                   # Trained models
 ├── notebooks/                # Jupyter notebooks
 ├── reports/                  # Reports
 │   └── figures/
 ├── src/                      # Source code
 │   └── project_name/
-│       ├── modules/          # Models modules
-│       ├── __init__.py
-│       ├── app_client.py
-│       ├── app.py
-│       ├── data.py
-│       ├── preprocess.py
-│       ├── train.py
-│       └── visualize.py
+│   │   ├── modules/          # Models modules
+│   │   │   └── encoders/
+│   │   │   │   ├── __init__.py
+│   │   │   │   └── pointnet.py
+│   │   ├── utils/
+│   │   │   ├── __init__.py
+│   │   │   ├── preprocess_utils.py
+│   │   │   └── train_utils.py
+│   │   ├── app_client.py
+│   │   ├── app.py
+│   │   ├── data.py
+│   │   ├── preprocess.py
+│   │   ├── train.py
+│   │   └── visualize.py
 └── tests/                    # Tests
 │   ├── __init__.py
 │   ├── test_api.py
 │   ├── test_data.py
 │   └── test_model.py
+├── .dvcignore
 ├── .gitignore
 ├── .pre-commit-config.yaml
+├── cloudbuild.yaml
 ├── LICENSE
+├── models.dvc
 ├── pyproject.toml            # Python project file
 ├── README.md                 # Project README
-├── requirements.txt          # Project requirements
 ├── requirements_dev.txt      # Development requirements
+├── requirements.txt          # Project requirements
 └── tasks.py                  # Project tasks
+└── test.sh
 ```
 
 

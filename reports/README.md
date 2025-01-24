@@ -50,11 +50,11 @@ will check the repositories and the code to verify your answers.
 
 * [x] Create a git repository (M5)
 * [x] Make sure that all team members have write access to the GitHub repository (M5)
-* [ ] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
 * [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
 * [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
 * [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
-* [ ] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
+* [x] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
     are using (M2+M6)
 * [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
 * [x] Do a bit of code typing and remember to document essential parts of your code (M7)
@@ -73,8 +73,8 @@ will check the repositories and the code to verify your answers.
 ### Week 2
 
 * [x] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
 * [x] Get some continuous integration running on the GitHub repository (M17)
 * [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
 * [x] Add a linting step to your continuous integration (M17)
@@ -86,8 +86,8 @@ will check the repositories and the code to verify your answers.
 * [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [x] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 * [ ] Create a frontend for your API (M26)
 
@@ -108,8 +108,8 @@ will check the repositories and the code to verify your answers.
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -163,10 +163,13 @@ We used open3d as a framework to display the generated tree point clouds. We use
 >
 > Answer:
 
-We used conda/miniconda as a package manager. We would continuously update our requirements(_dev).txt files with whatever package(s) we needed, but without specifying the version. Finally, when the project was done, we created a brand new virtual environment from the created requirement files, and look for any possible dependency issues when running all relevant files. If the files could be run without encountering an error, the specific versions would be documented with ```pip freeze``` to the requirements(_dev).txt.
+We used conda/miniconda as a package manager. We would continuously update our requirements(_dev).txt files with whatever package(s) we needed, but without specifying the version. Finally, when the project was done, we created a brand new virtual environment from the created requirement files, and look for any possible dependency issues when running all relevant files. If the files could be run without encountering an error, the specific versions would be documented by listing their version number using ```conda list``` and copying it over.
 
 To get a complete copy of our development structure, one would have to run the following:
-```pip install -r requirements_dev.txt pip install -e .```
+```
+pip install -r requirements_dev.txt
+pip install -e .
+```
 
 
 ### Question 5
@@ -222,7 +225,24 @@ In larger projects, it is important to implement rules to test for code quality 
 >
 > Answer:
 
---- question 7 fill here ---
+For the data, we have tested:
+- Correct instance types
+- Correct dataset length
+- Correct splitting into train, val and test sets
+- Correct shaping of data
+- Correct device matching and error raising
+- Correct test creation of data loaders
+
+For the model, we have tested:
+- Correct instance types for all model outputs
+- Correct shape of input (and nested inputs)
+- Correct range of values for relevant methods
+- Correct shapes and types of all common functions used by all models
+
+For the api, we have tested:
+- Correct return type; a generated tree with the correct shape
+- Correct response status code is 200.
+
 
 ### Question 8
 
@@ -237,7 +257,11 @@ In larger projects, it is important to implement rules to test for code quality 
 >
 > Answer:
 
---- question 8 fill here ---
+Our report created by coverage can be seen in the following figure
+
+<img src="figures/coverage.png" alt="drawing" width="300"/>
+
+While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically ``None``.
 
 ### Question 9
 
@@ -267,7 +291,7 @@ We had a main branch where other branches would be created from this branch. The
 >
 > Answer:
 
---- question 10 fill here ---
+We used DVC for accessing our data remotely from a bucket in Google Cloud Storage. Likewise, all saved models were also linked to dvc. This was necessary for the project, as the data was too large to upload to GitHub and it made it easier to access when running Docker builds.
 
 ### Question 11
 
@@ -284,7 +308,17 @@ We had a main branch where other branches would be created from this branch. The
 >
 > Answer:
 
-A workflows folder was created with several tests that would be triggered when either 1) Pushes to the main branch or 2) Pull requests to the main branch. The latest version of MacOS, Windows and Ubuntu was tested with python 3.11 and 3.12. This would test, authenticating a service account to GCP, downloading the stored data and completing all aforementioned unit tests.
+A workflows folder was created with several tests that would be triggered when either 1) Pushes to the main branch or 2) Pull requests to the main branch. The latest version of MacOS, Windows and Ubuntu was tested with python 3.11 and 3.12. This would test:
+1) Correctly checking out
+2) Authenticating with GCP
+3) Setting up Google Cloud SDK
+4) Checking the GCP authentication
+5) Download a subset of the data stored in CS
+6) Setting up Python
+7) Installing dependencies
+8) Testing all unit tests and performance tests
+9) Making a coverage report
+
 
 ## Running code and tracking experiments
 
@@ -303,7 +337,10 @@ A workflows folder was created with several tests that would be triggered when e
 >
 > Answer:
 
-We mainly used hydra with config yaml files specific to the task. In order to run the task, an example could be to either run it with the default configs in the config file `python -m tree.train` or if we want to overwrite anything for specific experiments: `python -m tree.train epochs=40 model=flow`
+We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file `python -m tree.train` or if we want to overwrite anything for specific experiments: `python -m tree.train epochs=40 model=flow`
+
+Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over [the training script](src/tree/train.py), and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run ```wandb sweep configs/sweep.yaml```, followed by: ```wandb agent <sweep_id>```
+
 
 ### Question 13
 
@@ -318,7 +355,10 @@ We mainly used hydra with config yaml files specific to the task. In order to ru
 >
 > Answer:
 
-We used hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Setting the seed of torch as ```torch.manual_seed(args.seed)``` was also done before training started.
+We used Hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Is anyone reading this? Setting the pytorch seed as ```torch.manual_seed(args.seed)``` was also done before training started.
+
+A docker image were also created for reproducibility purposes such that any current or new developer can work with the same setup.
+
 
 ### Question 14
 
@@ -335,7 +375,10 @@ We used hydra to configure all our tasks which would save a copy of the used con
 >
 > Answer:
 
---- question 14 fill here ---
+The following images are from a sweep.
+<img src="figures/wandb_1.png" alt="storage" width="500"/>
+<img src="figures/wandb_2.png" alt="storage" width="500"/>
+<img src="figures/wandb_3.png" alt="storage" width="500"/>
 
 ### Question 15
 
@@ -376,7 +419,7 @@ Where `/mnt/disks/data-tree/processed-data` would be the location which the GCS 
 >
 > Answer:
 
-We have been using the VS Code debugger mainly and in some cases used the pdb Python library with `pdb.set_trace()`. We did not do any profiling as that tool can mainly be used to identify bottlenecks and where code can be optimized where the time given for this project was already limited so optimizing was not a priority.
+We have been using the VS Code debugger mainly and in some cases used the pdb Python library with `pdb.set_trace()`, whenever code had to be run via the command line. We did not do any profiling as that tool can mainly be used to identify bottlenecks and where code can be optimized where the time given for this project was already limited so optimizing was not a priority.
 
 ## Working in the cloud
 
@@ -413,9 +456,9 @@ We have been using the VS Code debugger mainly and in some cases used the pdb Py
 >
 > Answer:
 
-We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has volumes from GCS, the processed data and the models folder, where it’ll save the experiments to the models folder on GCS.
-When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`.
-
+We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`, but unfortunately these resources weren't available:
+<img src="figures/job_no_gpu.png" alt="no gpu" width="800"/>
+So we ended up trying to do it over CPU with the machine `e2-standard-4`, which took more than 30 minutes per epoch and in the end we decided to train locally.
 
 ### Question 19
 
@@ -458,7 +501,7 @@ When training we would be using the machine `n1-standard-2` with the GPU `nvidia
 > Answer:
 
 Yes. By using Google Cloud Batch, a VM would be created by running `gcloud batch jobs submit <BATCH_JOB_NAME> --location europe-west1 --config batch_jobs/config.json` where the specifications of the machine is defined inside the [config file](batch_jobs/config.json).
-The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `”script”` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](batch_jobs\parse_start_script_to_batch_config.py).
+The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `"script"` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](batch_jobs\parse_start_script_to_batch_config.py).
 
 Nvidia container toolkit would then be installed on the VM, the train docker image pulled from Artifact Registry and then the image would be run with the GCS mounted volumes further mounted onto the docker.
 where the image would save the results inside the mounted models folder, making the experiment logs, configs and models visible inside GCS.
@@ -481,7 +524,7 @@ A problem we encountered is that we couldn't get any GPUs for the batch jobs as 
 >
 > Answer:
 
-An API called [app.py](src\tree\app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](src\tree\app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
+An API called [app.py](src/tree/app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](src\tree\app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
 
 ### Question 24
 
@@ -497,7 +540,8 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 24 fill here ---
+Locally - couldn't be bothered.
+
 
 ### Question 25
 
@@ -512,7 +556,7 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 25 fill here ---
+The API is extremely simple with one method taking an argument that selects either the flow or gauss model for tree generation. Load testing returned the following results: Average response time was 279.58 ms, 95th percentile response time was 360 ms for one user.
 
 ### Question 26
 
@@ -527,7 +571,7 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 26 fill here ---
+We did not manage to implement monitoring. Monitoring could have been implemented both user-experience side such as: 1) The correlation between wait-time and requests per second in order to measure the user experience and profile how the model could be optimized, and 2) The usefulness of the generated trees perhaps by implementing a metric for how many generated trees were in fact downloaded to the computer and 3) the preference of models used to generate trees. And model performance wise on could use monitoring to make sure 1) The model deployment is not failing or having problems 2) The model is performing as expected.
 
 ## Overall discussion of project
 
@@ -546,7 +590,8 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 27 fill here ---
+We used $3.77 for the project. While everything was set up to train using batch jobs on the Compute Engine, sadly, no GPU's were ever available in the chosen region. Therefore, we ran things locally to get results faster
+:(
 
 ### Question 28
 
@@ -562,7 +607,10 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 28 fill here ---
+The extra features not introduced in the course were:
+- The devcontainer
+- Batch jobs set up for Compute Engine
+
 
 ### Question 29
 
@@ -593,7 +641,7 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 >
 > Answer:
 
---- question 30 fill here ---
+A lot of time was initially spent on finding relevant data and papers for how to approach the problem. A lot of considerations went into how the data was distributed, and how it should be handled/preprocessed to work in a PyTorch pipeline all while not training for too long. When the pipeline was determined, the greatest struggles involved the communication between the different tools presented i.e setting up wand while using Hydra for config handling, or unit testing the data with data stored remotely. Viewed in isolation, it was mostly not the tools themselves that were difficult to set up, but more the implementation of the entire workflow such that no errors would occur. A lot of time was also spent on resolving the errors produced by mypy.
 
 ### Question 31
 
@@ -611,4 +659,37 @@ An API called [app.py](src\tree\app.py) hosts a server that generates tree point
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s214629 was in charge of:
+- Find relevant paper(s)
+- Loading and preprocessing data
+- Mounting data from GCS to local computer and documenting it on different OS
+- Creating dockerfiles, devcontainer and setting up cloudbuild with a trigger
+- Setting up GC Batch to send batch jobs to train the models on Compute Engine
+    - Setting up pipeline and batch job scripts such that it runs with the container
+    in Artifact Registry pushed by Build, mounting GCS buckets to the VM and using
+    GC Secret Mager to login to wandb.
+
+Student s214655 was in charge of:
+- Find relevant paper(s)
+- Setting up git with the cookie cutter project template including any rulesets
+- Implementation of the model training
+- Setting up config files and loading them using Hydra
+- Setting up wandb sweeping
+- Logging relevant metrics
+- Setting up the continuous integration workflow which includes
+  - Connecting wandb and Cloud Storage with GitHub actions
+  - Unit testing of the data and models
+- Creating dockerfiles, devcontainer and setting up cloudbuild with a trigger
+
+Student s216135 was in charge of:
+- Requirements and requirements_dev files testing and finalization
+- Setting up version control (dvc) to Cloud Storage
+- Setting up an API and subsequent tree visualization
+- Updating all code to conform to mypy - what a bitch
+- Setting up the continuous integration workflow which includes
+  - Setting up multi-testing for multi OS
+  - Unit testing of the data, models and API
+  - Setting up pre-commit with ruff and other good coding practices
+
+
+All members contributed to the code, debugging and the final README, and we do not believe the contribution is skewed in any way. We have used ChatGPT mainly for helping with instructions to navigate GitHub and GCP. CoPilot has also helped with debugging the code and implementing meaningful unit tests.
