@@ -148,7 +148,7 @@ pip install -e .</code></p>
 <em>experiments.</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a <a href="src/tree/modules/">modules folder</a> was created within the source code. Extra functions would also be placed in a <a href="utils/">utils folder</a> for a cleaner code environment. <a href="dockerfiles/">Docker files</a>, <a href="configs/">config files</a>, <a href="models/">saved models</a> and <a href="tests/">test files</a> were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a <a href="batch_jobs/">batch jobs folder</a> to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.</p>
+<p>From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a <a href="/src/tree/modules/">modules folder</a> was created within the source code. Extra functions would also be placed in a <a href="/src/tree/utils/">utils folder</a> for a cleaner code environment. <a href="/dockerfiles/">Docker files</a>, <a href="/configs/">config files</a>, <a href="/models/">saved models</a> and <a href="/tests/">test files</a> were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a <a href="/batch_jobs/">batch jobs folder</a> to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.</p>
 <h3>Question 6</h3>
 <blockquote>
 <p><strong>Did you implement any rules for code quality and format? What about typing and documentation? Additionally,</strong>
@@ -263,7 +263,7 @@ especially the reproducibility of your experiments.</p>
 <p>Answer:</p>
 </blockquote>
 <p>We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file <code>python -m tree.train</code> or if we want to overwrite anything for specific experiments: <code>python -m tree.train epochs=40 model=flow</code></p>
-<p>Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over <a href="src/tree/train.py">the training script</a>, and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run <code>wandb sweep configs/sweep.yaml</code>, followed by: <code>wandb agent &lt;sweep_id&gt;</code></p>
+<p>Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over <a href="/src/tree/train.py">the training script</a>, and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run <code>wandb sweep configs/sweep.yaml</code>, followed by: <code>wandb agent &lt;sweep_id&gt;</code></p>
 <h3>Question 13</h3>
 <blockquote>
 <p><strong>Reproducibility of experiments are important. Related to the last question, how did you secure that no information</strong>
@@ -303,7 +303,7 @@ especially the reproducibility of your experiments.</p>
 <em>training docker image: <code>docker run trainer:latest lr=1e-3 batch_size=64</code>. Link to docker file: <weblink></em></p>
 <p>Answer:</p>
 </blockquote>
-<p>For our project we had several images, one for API, and one for development. The <a href="dockerfiles/cloud.dockerfile">development docker</a> would be run with a <a href=".devcontainer/devcontainer.json">devcontainer</a> during development and when training models over Google Cloud Batch, the run command would be the following:
+<p>For our project we had several images, one for API, and one for development. The <a href="/dockerfiles/cloud.dockerfile">development docker</a> would be run with a <a href="/.devcontainer/devcontainer.json">devcontainer</a> during development and when training models over Google Cloud Batch, the run command would be the following:
 <code>bash
 docker run -e WANDB_PROJECT=$WANDB_PROJECT \
   -e WANDB_ENTITY=$WANDB_ENTITY \
@@ -312,7 +312,7 @@ docker run -e WANDB_PROJECT=$WANDB_PROJECT \
   --volume /mnt/disks/models:/trees/models \
   --gpus all \
   --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c "wandb sweep configs/sweep.yaml"</code>
-Where <code>/mnt/disks/data-tree/processed-data</code> would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the <a href="batch_jobs/config.json">GC Batch config file</a></p>
+Where <code>/mnt/disks/data-tree/processed-data</code> would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the <a href="/batch_jobs/config.json">GC Batch config file</a></p>
 <h3>Question 16</h3>
 <blockquote>
 <p><strong>When running into bugs while trying to run your experiments, how did you perform debugging? Additionally, did you</strong>
@@ -351,7 +351,7 @@ Where <code>/mnt/disks/data-tree/processed-data</code> would be the location whi
 <em>using a custom container: ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the <a href="batch_jobs/config.json">configurations</a> given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine <code>n1-standard-2</code> with the GPU <code>nvidia-tesla-t4</code>, but unfortunately these resources weren't available:
+<p>We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the <a href="/batch_jobs/config.json">configurations</a> given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine <code>n1-standard-2</code> with the GPU <code>nvidia-tesla-t4</code>, but unfortunately these resources weren't available:
 <img alt="my_image" src="figures/job_no_gpu.png" /></p>
 <p>So we ended up trying to do it over CPU with the machine <code>e2-standard-4</code>, which took more than 30 minutes per epoch and in the end we decided to train locally.</p>
 <h3>Question 19</h3>
@@ -385,8 +385,8 @@ Where <code>/mnt/disks/data-tree/processed-data</code> would be the location whi
 <em>was because ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>Yes. By using Google Cloud Batch, a VM would be created by running <code>gcloud batch jobs submit &lt;BATCH_JOB_NAME&gt; --location europe-west1 --config batch_jobs/config.json</code> where the specifications of the machine is defined inside the <a href="batch_jobs/config.json">config file</a>.
-The VM would then have mounted the GCS buckets <code>data-tree</code> and <code>models-tree</code>. Commands would then be run through the <code>"script"</code> field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a <a href="batch_jobs/start_script.sh">bash script</a> where it would be parsed into the batch config file by running a <a href="batch_jobs\parse_start_script_to_batch_config.py">python file</a>.</p>
+<p>Yes. By using Google Cloud Batch, a VM would be created by running <code>gcloud batch jobs submit &lt;BATCH_JOB_NAME&gt; --location europe-west1 --config batch_jobs/config.json</code> where the specifications of the machine is defined inside the <a href="/batch_jobs/config.json">config file</a>.
+The VM would then have mounted the GCS buckets <code>data-tree</code> and <code>models-tree</code>. Commands would then be run through the <code>"script"</code> field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a <a href="/batch_jobs/start_script.sh">bash script</a> where it would be parsed into the batch config file by running a <a href="/batch_jobs/parse_start_script_to_batch_config.py">python file</a>.</p>
 <p>Nvidia container toolkit would then be installed on the VM, the train docker image pulled from Artifact Registry and then the image would be run with the GCS mounted volumes further mounted onto the docker.
 where the image would save the results inside the mounted models folder, making the experiment logs, configs and models visible inside GCS.</p>
 <p>A problem we encountered is that we couldn't get any GPUs for the batch jobs as the "pool was exhausted for that region."</p>
@@ -401,7 +401,7 @@ where the image would save the results inside the mounted models folder, making 
 <em>to the API to make it more ...</em></p>
 <p>Answer:</p>
 </blockquote>
-<p>An API called <a href="src/tree/app.py">app.py</a> hosts a server that generates tree point clouds. The user can choose the generation model by specifying either <code>generate/flow</code> or <code>generate/gauss</code> in the url as seen in the <a href="src\tree\app_client.py">app_client.py</a> example usage. To avoid having to load the models upon every GET request, <code>FastAPI</code> lifespan parameter is used to store the model instances in a dictionary for later use.</p>
+<p>An API called <a href="/src/tree/app.py">app.py</a> hosts a server that generates tree point clouds. The user can choose the generation model by specifying either <code>generate/flow</code> or <code>generate/gauss</code> in the url as seen in the <a href="/src/tree/app_client.py">app_client.py</a> example usage. To avoid having to load the models upon every GET request, <code>FastAPI</code> lifespan parameter is used to store the model instances in a dictionary for later use.</p>
 <h3>Question 24</h3>
 <blockquote>
 <p><strong>Did you manage to deploy your API, either in locally or cloud? If not, describe why. If yes, describe how and</strong>

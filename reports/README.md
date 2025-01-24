@@ -186,7 +186,7 @@ pip install -e .
 >
 > Answer:
 
-From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a [modules folder](src/tree/modules/) was created within the source code. Extra functions would also be placed in a [utils folder](utils/) for a cleaner code environment. [Docker files](dockerfiles/), [config files](configs/), [saved models](models/) and [test files](tests/) were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a [batch jobs folder](batch_jobs/) to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.
+From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a [modules folder](/src/tree/modules/) was created within the source code. Extra functions would also be placed in a [utils folder](/src/tree/utils/) for a cleaner code environment. [Docker files](/dockerfiles/), [config files](/configs/), [saved models](/models/) and [test files](/tests/) were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a [batch jobs folder](/batch_jobs/) to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.
 
 ### Question 6
 
@@ -339,7 +339,7 @@ A workflows folder was created with several tests that would be triggered when e
 
 We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file `python -m tree.train` or if we want to overwrite anything for specific experiments: `python -m tree.train epochs=40 model=flow`
 
-Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over [the training script](src/tree/train.py), and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run ```wandb sweep configs/sweep.yaml```, followed by: ```wandb agent <sweep_id>```
+Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over [the training script](/src/tree/train.py), and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run ```wandb sweep configs/sweep.yaml```, followed by: ```wandb agent <sweep_id>```
 
 
 ### Question 13
@@ -395,7 +395,7 @@ As seen on the third image we have tracked training loss and validation loss ove
 >
 > Answer:
 
-For our project we had several images, one for API, and one for development. The [development docker](dockerfiles/cloud.dockerfile) would be run with a [devcontainer](.devcontainer/devcontainer.json) during development and when training models over Google Cloud Batch, the run command would be the following:
+For our project we had several images, one for API, and one for development. The [development docker](/dockerfiles/cloud.dockerfile) would be run with a [devcontainer](/.devcontainer/devcontainer.json) during development and when training models over Google Cloud Batch, the run command would be the following:
 ```bash
 docker run -e WANDB_PROJECT=$WANDB_PROJECT \
   -e WANDB_ENTITY=$WANDB_ENTITY \
@@ -405,7 +405,7 @@ docker run -e WANDB_PROJECT=$WANDB_PROJECT \
   --gpus all \
   --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c "wandb sweep configs/sweep.yaml"
 ```
-Where `/mnt/disks/data-tree/processed-data` would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the [GC Batch config file](batch_jobs/config.json)
+Where `/mnt/disks/data-tree/processed-data` would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the [GC Batch config file](/batch_jobs/config.json)
 
 
 ### Question 16
@@ -458,7 +458,7 @@ We have been using the VS Code debugger mainly and in some cases used the pdb Py
 >
 > Answer:
 
-We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`, but unfortunately these resources weren't available:
+We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](/batch_jobs/config.json) given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`, but unfortunately these resources weren't available:
 ![my_image](figures/job_no_gpu.png)
 
 So we ended up trying to do it over CPU with the machine `e2-standard-4`, which took more than 30 minutes per epoch and in the end we decided to train locally.
@@ -503,8 +503,8 @@ So we ended up trying to do it over CPU with the machine `e2-standard-4`, which 
 >
 > Answer:
 
-Yes. By using Google Cloud Batch, a VM would be created by running `gcloud batch jobs submit <BATCH_JOB_NAME> --location europe-west1 --config batch_jobs/config.json` where the specifications of the machine is defined inside the [config file](batch_jobs/config.json).
-The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `"script"` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](batch_jobs\parse_start_script_to_batch_config.py).
+Yes. By using Google Cloud Batch, a VM would be created by running `gcloud batch jobs submit <BATCH_JOB_NAME> --location europe-west1 --config batch_jobs/config.json` where the specifications of the machine is defined inside the [config file](/batch_jobs/config.json).
+The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `"script"` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](/batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](/batch_jobs/parse_start_script_to_batch_config.py).
 
 Nvidia container toolkit would then be installed on the VM, the train docker image pulled from Artifact Registry and then the image would be run with the GCS mounted volumes further mounted onto the docker.
 where the image would save the results inside the mounted models folder, making the experiment logs, configs and models visible inside GCS.
@@ -527,7 +527,7 @@ A problem we encountered is that we couldn't get any GPUs for the batch jobs as 
 >
 > Answer:
 
-An API called [app.py](src/tree/app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](src\tree\app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
+An API called [app.py](/src/tree/app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](/src/tree/app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
 
 ### Question 24
 
