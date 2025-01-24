@@ -143,7 +143,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 3 fill here ---
+We used open3d as a framework to display the generated tree point clouds. We used the functionality of visualizing via the function```visualization.draw_geometries()``` to render the data and generated trees. To assist the illusion, ```paint_uniform_color``` allows us to draw them green.
 
 ## Coding environment
 
@@ -163,7 +163,11 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 4 fill here ---
+We used conda/miniconda as a package manager. We would continuously update our requirements(_dev).txt files with whatever package(s) we needed, but without specifying the version. Finally, when the project was done, we created a brand new virtual environment from the created requirement files, and look for any possible dependency issues when running all relevant files. If the files could be run without encountering an error, the specific versions would be documented with ```pip freeze``` to the requirements(_dev).txt.
+
+To get a complete copy of our development structure, one would have to run the following:
+```pip install -r requirements_dev.txt pip install -e .```
+
 
 ### Question 5
 
@@ -179,7 +183,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 5 fill here ---
+From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a [modules folder](src/tree/modules/) was created within the source code. Extra functions would also be placed in a [utils folder](utils/) for a cleaner code environment. [Docker files](dockerfiles/), [config files](configs/), [saved models](models/) and [test files](tests/) were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a [batch jobs folder](batch_jobs/) to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.
 
 ### Question 6
 
@@ -194,7 +198,12 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 6 fill here ---
+Regarding the GitHub project, two rules were enforced using the ruleset option: 1) Pull requests needed to be reviewed by someone other than the one requesting, and 2) All code requested to be merged into main must pass all created GitHub action tests.
+
+Regarding formatting, pre-commits were implemented such that all committed code would be checked for: Trailing whitespaces, end-of-file fixer, yaml checking and added larger files. Additionally, ruff would, prior to accepting the commit, format any file to comply with rules added in the pyproject.toml. Mypy would also check for correct typing, and would have to be manually edited.
+
+In larger projects, it is important to implement rules to test for code quality and formatting, as it adds to the explainability and consistency of the code both among project members and peer review. It also ensures that any merges to main do not result in unexpected errors that were otherwise absent in earlier iterations.
+
 
 ## Version control
 
@@ -243,7 +252,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 9 fill here ---
+We had a main branch where other branches would be created from this branch. These branches would have the name of the feature that they implemented and when done, they would be merged into the main branch through pull requests. This helps versioning as it is much easier to keep track of features and their progress as well as making sure it is only the final working feature that is merged onto main.
 
 ### Question 10
 
@@ -275,7 +284,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 11 fill here ---
+A workflows folder was created with several tests that would be triggered when either 1) Pushes to the main branch or 2) Pull requests to the main branch. The latest version of MacOS, Windows and Ubuntu was tested with python 3.11 and 3.12. This would test, authenticating a service account to GCP, downloading the stored data and completing all aforementioned unit tests.
 
 ## Running code and tracking experiments
 
@@ -294,7 +303,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 12 fill here ---
+We mainly used hydra with config yaml files specific to the task. In order to run the task, an example could be to either run it with the default configs in the config file `python -m tree.train` or if we want to overwrite anything for specific experiments: `python -m tree.train epochs=40 model=flow`
 
 ### Question 13
 
@@ -309,7 +318,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 13 fill here ---
+We used hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Setting the seed of torch as ```torch.manual_seed(args.seed)``` was also done before training started.
 
 ### Question 14
 
@@ -341,7 +350,18 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 15 fill here ---
+For our project we had several images, one for API, and one for development. The [development docker](dockerfiles/cloud.dockerfile) would be run with a [devcontainer](.devcontainer/devcontainer.json) during development and when training models over Google Cloud Batch, the run command would be the following:
+```bash
+docker run -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e WANDB_ENTITY=$WANDB_ENTITY \
+  -e WANDB_API_KEY=$WANDB_API_KEY \
+  --volume /mnt/disks/data-tree/processed-data:/trees/data/processed \
+  --volume /mnt/disks/models:/trees/models \
+  --gpus all \
+  --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c "wandb sweep configs/sweep.yaml"
+```
+Where `/mnt/disks/data-tree/processed-data` would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the [GC Batch config file](batch_jobs/config.json)
+
 
 ### Question 16
 
@@ -356,7 +376,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 16 fill here ---
+We have been using the VS Code debugger mainly and in some cases used the pdb Python library with `pdb.set_trace()`. We did not do any profiling as that tool can mainly be used to identify bottlenecks and where code can be optimized where the time given for this project was already limited so optimizing was not a priority.
 
 ## Working in the cloud
 
@@ -373,7 +393,12 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 17 fill here ---
+*Storage: Storing the data and models.
+*Storage FUSE: Mounting stored data on GCS to personal computer in order to test and develop locally.
+*Batch/Compute Engine: Batch for sending batch jobs for training which would automatically create a temporary VM in and delete it when the batch job is done.
+*Artifact Registry: To store docker images.
+*Build: To trigger upon every time a change has been made in the main github branch which builds and then pushes an updated docker image in Artifact Registry.
+
 
 ### Question 18
 
@@ -388,7 +413,9 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 18 fill here ---
+We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has volumes from GCS, the processed data and the models folder, where it’ll save the experiments to the models folder on GCS.
+When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`.
+
 
 ### Question 19
 
@@ -430,7 +457,14 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 22 fill here ---
+Yes. By using Google Cloud Batch, a VM would be created by running `gcloud batch jobs submit <BATCH_JOB_NAME> --location europe-west1 --config batch_jobs/config.json` where the specifications of the machine is defined inside the [config file](batch_jobs/config.json).
+The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `”script”` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](batch_jobs\parse_start_script_to_batch_config.py).
+
+Nvidia container toolkit would then be installed on the VM, the train docker image pulled from Artifact Registry and then the image would be run with the GCS mounted volumes further mounted onto the docker.
+where the image would save the results inside the mounted models folder, making the experiment logs, configs and models visible inside GCS.
+
+A problem we encountered is that we couldn't get any GPUs for the batch jobs as the "pool was exhausted for that region."
+
 
 ## Deployment
 
@@ -447,7 +481,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 23 fill here ---
+An API called [app.py](src\tree\app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](src\tree\app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
 
 ### Question 24
 
