@@ -45,9 +45,6 @@ class PCTreeDataset(Dataset):  # type: ignore
         xyz_data = np.load(file_path)
         data = torch.from_numpy(xyz_data)  # Note, might need to change the dtype
 
-        if self.transform is not None:
-            data = self.transform(data)
-
         return data
 
     def get_train_val_test_datasets(self, train_ratio: float, val_ratio: float) -> Tuple[Dataset, Dataset, Dataset]:
