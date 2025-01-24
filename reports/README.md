@@ -48,46 +48,46 @@ will check the repositories and the code to verify your answers.
 
 ### Week 1
 
-* [ ] Create a git repository (M5)
-* [ ] Make sure that all team members have write access to the GitHub repository (M5)
-* [ ] Create a dedicated environment for you project to keep track of your packages (M2)
-* [ ] Create the initial file structure using cookiecutter with an appropriate template (M6)
-* [ ] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
-* [ ] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
-* [ ] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
+* [x] Create a git repository (M5)
+* [x] Make sure that all team members have write access to the GitHub repository (M5)
+* [x] Create a dedicated environment for you project to keep track of your packages (M2)
+* [x] Create the initial file structure using cookiecutter with an appropriate template (M6)
+* [x] Fill out the `data.py` file such that it downloads whatever data you need and preprocesses it (if necessary) (M6)
+* [x] Add a model to `model.py` and a training procedure to `train.py` and get that running (M6)
+* [x] Remember to fill out the `requirements.txt` and `requirements_dev.txt` file with whatever dependencies that you
     are using (M2+M6)
-* [ ] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
-* [ ] Do a bit of code typing and remember to document essential parts of your code (M7)
-* [ ] Setup version control for your data or part of your data (M8)
-* [ ] Add command line interfaces and project commands to your code where it makes sense (M9)
-* [ ] Construct one or multiple docker files for your code (M10)
-* [ ] Build the docker files locally and make sure they work as intended (M10)
-* [ ] Write one or multiple configurations files for your experiments (M11)
-* [ ] Used Hydra to load the configurations and manage your hyperparameters (M11)
+* [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
+* [x] Do a bit of code typing and remember to document essential parts of your code (M7)
+* [x] Setup version control for your data or part of your data (M8)
+* [x] Add command line interfaces and project commands to your code where it makes sense (M9)
+* [x] Construct one or multiple docker files for your code (M10)
+* [x] Build the docker files locally and make sure they work as intended (M10)
+* [x] Write one or multiple configurations files for your experiments (M11)
+* [x] Used Hydra to load the configurations and manage your hyperparameters (M11)
 * [ ] Use profiling to optimize your code (M12)
-* [ ] Use logging to log important events in your code (M14)
-* [ ] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
-* [ ] Consider running a hyperparameter optimization sweep (M14)
+* [x] Use logging to log important events in your code (M14)
+* [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
+* [x] Consider running a hyperparameter optimization sweep (M14)
 * [ ] Use PyTorch-lightning (if applicable) to reduce the amount of boilerplate in your code (M15)
 
 ### Week 2
 
-* [ ] Write unit tests related to the data part of your code (M16)
-* [ ] Write unit tests related to model construction and or model training (M16)
-* [ ] Calculate the code coverage (M16)
-* [ ] Get some continuous integration running on the GitHub repository (M17)
-* [ ] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
-* [ ] Add pre-commit hooks to your version control setup (M18)
+* [x] Write unit tests related to the data part of your code (M16)
+* [x] Write unit tests related to model construction and or model training (M16)
+* [x] Calculate the code coverage (M16)
+* [x] Get some continuous integration running on the GitHub repository (M17)
+* [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
+* [x] Add pre-commit hooks to your version control setup (M18)
 * [ ] Add a continues workflow that triggers when data changes (M19)
 * [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
-* [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
-* [ ] Create a FastAPI application that can do inference using your model (M22)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [x] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [x] Create a FastAPI application that can do inference using your model (M22)
 * [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [x] Load test your application (M24)
 * [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
 * [ ] Create a frontend for your API (M26)
 
@@ -98,7 +98,7 @@ will check the repositories and the code to verify your answers.
 * [ ] Instrument your API with a couple of system metrics (M28)
 * [ ] Setup cloud monitoring of your instrumented application (M28)
 * [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [x] If applicable, optimize the performance of your data loading using distributed data loading (M29)
 * [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
 * [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
@@ -108,8 +108,8 @@ will check the repositories and the code to verify your answers.
 * [ ] Publish the documentation to GitHub Pages (M32)
 * [ ] Revisit your initial project description. Did the project turn out as you wanted?
 * [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -143,7 +143,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 3 fill here ---
+We used open3d as a framework to display the generated tree point clouds. We used the functionality of visualizing via the function```visualization.draw_geometries()``` to render the data and generated trees. To assist the illusion, ```paint_uniform_color``` allows us to draw them green.
 
 ## Coding environment
 
@@ -163,7 +163,14 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 4 fill here ---
+We used conda/miniconda as a package manager. We would continuously update our requirements(_dev).txt files with whatever package(s) we needed, but without specifying the version. Finally, when the project was done, we created a brand new virtual environment from the created requirement files, and look for any possible dependency issues when running all relevant files. If the files could be run without encountering an error, the specific versions would be documented by listing their version number using ```conda list``` and copying it over.
+
+To get a complete copy of our development structure, one would have to run the following:
+```
+pip install -r requirements_dev.txt
+pip install -e .
+```
+
 
 ### Question 5
 
@@ -179,7 +186,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 5 fill here ---
+From the cookiecutter template, our structure mostly follows: The source code is located within the src/tree folder including data processing, model construction and training. Due to a large number of module classes, a [modules folder](src/tree/modules/) was created within the source code. Extra functions would also be placed in a [utils folder](utils/) for a cleaner code environment. [Docker files](dockerfiles/), [config files](configs/), [saved models](models/) and [test files](tests/) were all separated in their respective folders. Deviation from the template included the creation of a devcontainer to work in, a [batch jobs folder](batch_jobs/) to submit training code to the GCP Compute Engine. Furthermore, several dotfiles were created such as cloudbuild, pre-commit and dvc configuration.
 
 ### Question 6
 
@@ -194,7 +201,12 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 6 fill here ---
+Regarding the GitHub project, two rules were enforced using the ruleset option: 1) Pull requests needed to be reviewed by someone other than the one requesting, and 2) All code requested to be merged into main must pass all created GitHub action tests.
+
+Regarding formatting, pre-commits were implemented such that all committed code would be checked for: Trailing whitespaces, end-of-file fixer, yaml checking and added larger files. Additionally, ruff would, prior to accepting the commit, format any file to comply with rules added in the pyproject.toml. Mypy would also check for correct typing, and would have to be manually edited.
+
+In larger projects, it is important to implement rules to test for code quality and formatting, as it adds to the explainability and consistency of the code both among project members and peer review. It also ensures that any merges to main do not result in unexpected errors that were otherwise absent in earlier iterations.
+
 
 ## Version control
 
@@ -213,7 +225,24 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 7 fill here ---
+For the data, we have tested:
+- Correct instance types
+- Correct dataset length
+- Correct splitting into train, val and test sets
+- Correct shaping of data
+- Correct device matching and error raising
+- Correct test creation of data loaders
+
+For the model, we have tested:
+- Correct instance types for all model outputs
+- Correct shape of input (and nested inputs)
+- Correct range of values for relevant methods
+- Correct shapes and types of all common functions used by all models
+
+For the api, we have tested:
+- Correct return type; a generated tree with the correct shape
+- Correct response status code is 200.
+
 
 ### Question 8
 
@@ -228,7 +257,11 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 8 fill here ---
+Our report created by coverage can be seen in the following figure
+
+<img src="figures/coverage.png" alt="drawing" width="300"/>
+
+While of course, it is good that as much code as possible is being tested, a code coverage score of 100% would not equal an error-free code: The coverage percentage may not account for edge case testing. In general, it is good practice to account for different types of input such as None, nan, infinity and negative to ensure that the program acts in a desired way. Error checks may also help to ensure that the correct error message is displayed. Edge cases were mititigated a little using mypy, that multiple types showed us that a certain type was assumed, when really it could take another type - typically ``None``.
 
 ### Question 9
 
@@ -243,7 +276,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 9 fill here ---
+We had a main branch where other branches would be created from this branch. These branches would have the name of the feature that they implemented and when done, they would be merged into the main branch through pull requests. This helps versioning as it is much easier to keep track of features and their progress as well as making sure it is only the final working feature that is merged onto main. Whenever a feature was merged into main, the branch would be deleted.
 
 ### Question 10
 
@@ -258,7 +291,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 10 fill here ---
+We used DVC for accessing our data remotely from a bucket in Google Cloud Storage. Likewise, all saved models were also linked to dvc. This was necessary for the project, as the data was too large to upload to GitHub and it made it easier to access when running Docker builds.
 
 ### Question 11
 
@@ -275,7 +308,17 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 11 fill here ---
+A workflows folder was created with several tests that would be triggered when either 1) Pushes to the main branch or 2) Pull requests to the main branch. The latest version of MacOS, Windows and Ubuntu was tested with python 3.11 and 3.12. This would test:
+1) Correctly checking out
+2) Authenticating with GCP
+3) Setting up Google Cloud SDK
+4) Checking the GCP authentication
+5) Download a subset of the data stored in CS
+6) Setting up Python
+7) Installing dependencies
+8) Testing all unit tests and performance tests
+9) Making a coverage report
+
 
 ## Running code and tracking experiments
 
@@ -294,7 +337,10 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 12 fill here ---
+We mainly used Hydra with config yaml files specific to the task; specifically, one was created for configuring any preprocessing, and one was created for configuring the training arguments - among some of which are hyperparameters. In order to run the task, an example could be to either run it with the default configs in the config file `python -m tree.train` or if we want to overwrite anything for specific experiments: `python -m tree.train epochs=40 model=flow`
+
+Sweeping was also implemented using wandb in connection with Hydra. The sweep would run over [the training script](src/tree/train.py), and run a bayesian optimization over the hyperparameters defined in the Hydra configuration file. To run a sweep, one would need to run ```wandb sweep configs/sweep.yaml```, followed by: ```wandb agent <sweep_id>```
+
 
 ### Question 13
 
@@ -309,7 +355,10 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 13 fill here ---
+We used Hydra to configure all our tasks which would save a copy of the used config files for the experiment, and by overwriting the hydra output folder we could make it save the configs in the experiment specific folder. Is anyone reading this? Setting the pytorch seed as ```torch.manual_seed(args.seed)``` was also done before training started.
+
+A docker image were also created for reproducibility purposes such that any current or new developer can work with the same setup.
+
 
 ### Question 14
 
@@ -326,7 +375,11 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 14 fill here ---
+The following images are from a sweep.
+<img src="figures/wandb_1.png" alt="storage" width="500"/>
+<img src="figures/wandb_2.png" alt="storage" width="500"/>
+<img src="figures/wandb_3.png" alt="storage" width="500"/>
+As seen on the third image we have tracked training loss and validation loss over each epoch. Test loss was not tracked in order to save time for the training. When running sweep we could also keep track of the parameters and how the sweep runs was doing which each run.
 
 ### Question 15
 
@@ -341,7 +394,18 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 15 fill here ---
+For our project we had several images, one for API, and one for development. The [development docker](dockerfiles/cloud.dockerfile) would be run with a [devcontainer](.devcontainer/devcontainer.json) during development and when training models over Google Cloud Batch, the run command would be the following:
+```bash
+docker run -e WANDB_PROJECT=$WANDB_PROJECT \
+  -e WANDB_ENTITY=$WANDB_ENTITY \
+  -e WANDB_API_KEY=$WANDB_API_KEY \
+  --volume /mnt/disks/data-tree/processed-data:/trees/data/processed \
+  --volume /mnt/disks/models:/trees/models \
+  --gpus all \
+  --entrypoint /bin/bash europe-west1-docker.pkg.dev/dtu-mlops-tree/tree/train:latest -c "wandb sweep configs/sweep.yaml"
+```
+Where `/mnt/disks/data-tree/processed-data` would be the location which the GCS data bucket is mounted on the vm which can be seen in more details in the [GC Batch config file](batch_jobs/config.json)
+
 
 ### Question 16
 
@@ -356,7 +420,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 16 fill here ---
+We have been using the VS Code debugger mainly and in some cases used the pdb Python library with `pdb.set_trace()`, whenever code had to be run via the command line. We did not do any profiling as that tool can mainly be used to identify bottlenecks and where code can be optimized where the time given for this project was already limited so optimizing was not a priority.
 
 ## Working in the cloud
 
@@ -373,7 +437,12 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 17 fill here ---
+*Storage: Storing the data and models.
+*Storage FUSE: Mounting stored data on GCS to personal computer in order to test and develop locally.
+*Batch/Compute Engine: Batch for sending batch jobs for training which would automatically create a temporary VM in and delete it when the batch job is done.
+*Artifact Registry: To store docker images.
+*Build: To trigger upon every time a change has been made in the main github branch which builds and then pushes an updated docker image in Artifact Registry.
+
 
 ### Question 18
 
@@ -388,7 +457,9 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 18 fill here ---
+We use Compute Engine through Google Cloud Batch which creates a VM in Compute Engine for each training job with the [configurations](batch_jobs/config.json) given and then deletes the VM after. The VM has mounted volumes from GCS, the processed data and the models folder, where it'll save the experiments to the models folder on GCS. When training we would be using the machine `n1-standard-2` with the GPU `nvidia-tesla-t4`, but unfortunately these resources weren't available:
+<img src="figures/job_no_gpu.png" alt="no gpu" width="800"/>
+So we ended up trying to do it over CPU with the machine `e2-standard-4`, which took more than 30 minutes per epoch and in the end we decided to train locally.
 
 ### Question 19
 
@@ -397,7 +468,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 19 fill here ---
+<img src="figures/storage_bucket.png" alt="storage" width="800"/>
 
 ### Question 20
 
@@ -406,7 +477,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 20 fill here ---
+<img src="figures/artifact_reg.png" alt="artifact" width="800"/>
 
 ### Question 21
 
@@ -415,7 +486,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 21 fill here ---
+<img src="figures/cloud_build.png" alt="build" width="800"/>
 
 ### Question 22
 
@@ -430,7 +501,14 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 22 fill here ---
+Yes. By using Google Cloud Batch, a VM would be created by running `gcloud batch jobs submit <BATCH_JOB_NAME> --location europe-west1 --config batch_jobs/config.json` where the specifications of the machine is defined inside the [config file](batch_jobs/config.json).
+The VM would then have mounted the GCS buckets `data-tree` and `models-tree`. Commands would then be run through the `"script"` field inside the batch config. In order to make it easier to define the commands, the commands would be gathered in a [bash script](batch_jobs/start_script.sh) where it would be parsed into the batch config file by running a [python file](batch_jobs\parse_start_script_to_batch_config.py).
+
+Nvidia container toolkit would then be installed on the VM, the train docker image pulled from Artifact Registry and then the image would be run with the GCS mounted volumes further mounted onto the docker.
+where the image would save the results inside the mounted models folder, making the experiment logs, configs and models visible inside GCS.
+
+A problem we encountered is that we couldn't get any GPUs for the batch jobs as the "pool was exhausted for that region."
+
 
 ## Deployment
 
@@ -447,7 +525,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 23 fill here ---
+An API called [app.py](src/tree/app.py) hosts a server that generates tree point clouds. The user can choose the generation model by specifying either ```generate/flow``` or ```generate/gauss``` in the url as seen in the [app_client.py](src\tree\app_client.py) example usage. To avoid having to load the models upon every GET request, ```FastAPI``` lifespan parameter is used to store the model instances in a dictionary for later use.
 
 ### Question 24
 
@@ -463,7 +541,8 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 24 fill here ---
+Locally - couldn't be bothered.
+
 
 ### Question 25
 
@@ -478,7 +557,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 25 fill here ---
+The API is extremely simple with one method taking an argument that selects either the flow or gauss model for tree generation. Load testing returned the following results: Average response time was 279.58 ms, 95th percentile response time was 360 ms for one user.
 
 ### Question 26
 
@@ -493,7 +572,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 26 fill here ---
+We did not manage to implement monitoring. Monitoring could have been implemented both user-experience side such as: 1) The correlation between wait-time and requests per second in order to measure the user experience and profile how the model could be optimized, and 2) The usefulness of the generated trees perhaps by implementing a metric for how many generated trees were in fact downloaded to the computer and 3) the preference of models used to generate trees. And model performance wise on could use monitoring to make sure 1) The model deployment is not failing or having problems 2) The model is performing as expected.
 
 ## Overall discussion of project
 
@@ -512,7 +591,8 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 27 fill here ---
+We used $3.77 for the project. While everything was set up to train using batch jobs on the Compute Engine, sadly, no GPU's were ever available in the chosen region. Therefore, we ran things locally to get results faster
+:(
 
 ### Question 28
 
@@ -528,7 +608,10 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 28 fill here ---
+The extra features not introduced in the course were:
+- The devcontainer
+- Batch jobs set up for Compute Engine
+
 
 ### Question 29
 
@@ -559,7 +642,7 @@ s214629, s214655, s216135
 >
 > Answer:
 
---- question 30 fill here ---
+A lot of time was initially spent on finding relevant data and papers for how to approach the problem. A lot of considerations went into how the data was distributed, and how it should be handled/preprocessed to work in a PyTorch pipeline all while not training for too long. When the pipeline was determined, the greatest struggles involved the communication between the different tools presented i.e setting up wand while using Hydra for config handling, or unit testing the data with data stored remotely. Viewed in isolation, it was mostly not the tools themselves that were difficult to set up, but more the implementation of the entire workflow such that no errors would occur. A lot of time was also spent on resolving the errors produced by mypy.
 
 ### Question 31
 
@@ -577,4 +660,37 @@ s214629, s214655, s216135
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+Student s214629 was in charge of:
+- Find relevant paper(s)
+- Loading and preprocessing data
+- Mounting data from GCS to local computer and documenting it on different OS
+- Creating dockerfiles, devcontainer and setting up cloudbuild with a trigger
+- Setting up GC Batch to send batch jobs to train the models on Compute Engine
+    - Setting up pipeline and batch job scripts such that it runs with the container
+    in Artifact Registry pushed by Build, mounting GCS buckets to the VM and using
+    GC Secret Mager to login to wandb.
+
+Student s214655 was in charge of:
+- Find relevant paper(s)
+- Setting up git with the cookie cutter project template including any rulesets
+- Implementation of the model training
+- Setting up config files and loading them using Hydra
+- Setting up wandb sweeping
+- Logging relevant metrics
+- Setting up the continuous integration workflow which includes
+  - Connecting wandb and Cloud Storage with GitHub actions
+  - Unit testing of the data and models
+- Creating dockerfiles, devcontainer and setting up cloudbuild with a trigger
+
+Student s216135 was in charge of:
+- Requirements and requirements_dev files testing and finalization
+- Setting up version control (dvc) to Cloud Storage
+- Setting up an API and subsequent tree visualization
+- Updating all code to conform to mypy - what a bitch
+- Setting up the continuous integration workflow which includes
+  - Setting up multi-testing for multi OS
+  - Unit testing of the data, models and API
+  - Setting up pre-commit with ruff and other good coding practices
+
+
+All members contributed to the code, debugging and the final README, and we do not believe the contribution is skewed in any way. We have used ChatGPT mainly for helping with instructions to navigate GitHub and GCP. CoPilot has also helped with debugging the code and implementing meaningful unit tests.
