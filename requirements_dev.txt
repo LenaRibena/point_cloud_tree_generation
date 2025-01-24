@@ -1,46 +1,45 @@
 # commands
-invoke
+invoke==2.2.0
 
 # pre-commit
-pre-commit
+pre-commit==4.1.0
 
 # testing
-pytest
-coverage
+pytest==8.3.4
+coverage==7.6.10
 
 # linting
-ruff
-mypy
+ruff==0.9.3
+mypy==1.14.1
 
 # docs
-mkdocs
-mkdocs-material
-mkdocstrings-python
+mkdocs==1.6.1
+mkdocs-material==9.5.50
+mkdocstrings-python==1.13.0
 
 # cloud storage (models)
-dvc
-gcloud
-dvc-gs
+dvc==3.59.0
+gcloud==0.18.3
+dvc-gs==3.0.1
 
 # wandb
-wandb
-python-dotenv
-omegaconf
-tensorboard
+wandb==0.19.4
+python-dotenv==1.0.1
+omegaconf==2.3.0
+tensorboard==2.18.0
 
-ruamel-yaml
+ruamel-yaml==0.18.10
 
 # logging
-loguru
+loguru==0.7.3
 
-# other
-numpy
-torch
+
 
 # stubs (mypy)
-types-requests
-types-tqdm
-types-cachetools
-types-cffi
-types-protobuf
-types-pyOpenSSL
+types-requests==2.32.0.20241016
+types-tqdm==4.67.0.20241221
+types-cachetools==5.5.0.20240820
+types-cffi==1.16.0.20241221
+types-protobuf==5.29.1.20241207
+types-pyOpenSSL==24.1.0.20240722
+pandas-stubs==2.2.3.241126
