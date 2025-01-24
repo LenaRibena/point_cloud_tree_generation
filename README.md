@@ -6,18 +6,20 @@ Modelling objects is a tedious, yet essential, process. An example of its preval
 
 [The synthetic tree point cloud dataset](https://springernature.figshare.com/collections/_/6788358) provides pointclouds from 40 scanning projects on the streets of  Munich. The dataset includes a total of 3755 leaf-off individual point clouds of trees and processed tree quantative models using the algorithm in [TreeQSM](https://github.com/InverseTampere/TreeQSM).
 
-TODO INSERT IMAGES
 <img src="figures/point_cloud.png" alt="drawing" width="300"/>
-<img src="figures/branch.png" alt="drawing" width="300"/>
+<img src="figures/TreeQSM.png" alt="drawing" width="300"/>
 
 *Image description: A data sample from the dataset. It contains the point cloud (left) along with the corresponding quantative structure model with the fitted cylinders. (right)*
 
 The model chosen to tackle this particular task is the one presented in [Diffusion Probabilistic Models for 3D Point Cloud Generation](https://arxiv.org/abs/2103.01458) where a PointNet is trained to encode pointclouds into a sort of shape latent space distribution which the diffusion model conditions on and denoises back into a point cloud. When generating new trees, a gaussian $N(0,I)$ is diffused.
 
 Since the tree pointcloud dataset had 100.000s of points, they were downsampled by using the corresponding TreeQSM model, filtering out cylinders with low radius and prioritising branch orders.
+The downsampled tree from the above images would for example look like this:
+<img src="figures/point_cloud_downsampled.png" alt="drawing" width="300"/>
 
 ## Project Canvas
 
+*This is the project canvas for the first iteration after week 1, a lot of changed since then*
 <img src="figures/canvas.png" alt="drawing" width="600"/>
 
 
