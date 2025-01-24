@@ -7,6 +7,8 @@ pre-commit
 # testing
 pytest
 coverage
+httpx
+locust
 
 # linting
 ruff

@@ -42,3 +42,6 @@ follow_untyped_imports = true
 [tool.coverage.run]
 omit = ["tests/*"]
 source = ["src"]
+
+[tool.locust]
+host = "http://127.0.0.1:8000"
