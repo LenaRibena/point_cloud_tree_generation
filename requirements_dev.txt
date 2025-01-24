@@ -36,3 +36,11 @@ loguru
 # other
 numpy
 torch
+
+# stubs (mypy)
+types-requests
+types-tqdm
+types-cachetools
+types-cffi
+types-protobuf
+types-pyOpenSSL

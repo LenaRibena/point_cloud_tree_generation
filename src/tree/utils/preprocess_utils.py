@@ -5,7 +5,9 @@ import numpy as np
 # ---------------------------------------------------------------------------- #
 
 
-def generate_cylinder_points(start, axis, length, radius, num_points):
+def generate_cylinder_points(
+    start: np.ndarray, axis: np.ndarray, length: float, radius: float, num_points: int
+) -> np.ndarray:
     """
     Generate exactly `num_points` points uniformly or randomly across the curved surface
     of a cylinder (excluding top and bottom caps), optimized for performance.
@@ -46,7 +48,7 @@ def generate_cylinder_points(start, axis, length, radius, num_points):
     return points
 
 
-def get_rotation_matrix(axis):
+def get_rotation_matrix(axis: np.ndarray) -> np.ndarray:
     """
     Compute a rotation matrix to align a cylinder's local axis with the global z-axis.
     """
