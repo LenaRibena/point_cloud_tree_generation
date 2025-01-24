@@ -2,9 +2,9 @@ from argparse import Namespace
 
 import torch
 
-from tree.models.common import gaussian_entropy, reparameterize_gaussian, standard_normal_logprob
-from tree.models.vae_flow import FlowVAE
-from tree.models.vae_gaussian import GaussianVAE
+from tree.modules.common import gaussian_entropy, reparameterize_gaussian, standard_normal_logprob
+from tree.modules.vae_flow import FlowVAE
+from tree.modules.vae_gaussian import GaussianVAE
 
 
 def test_gaussian() -> None:
