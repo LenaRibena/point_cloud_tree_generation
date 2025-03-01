@@ -24,7 +24,7 @@ gcloud==0.18.3
 dvc-gs==3.0.1
 
 # wandb
-wandb==0.19.4
+wandb==0.19.7
 python-dotenv==1.0.1
 omegaconf==2.3.0
 tensorboard==2.18.0
